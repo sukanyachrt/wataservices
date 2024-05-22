@@ -1,5 +1,11 @@
 <script setup>
+import Cookies from 'js-cookie'
 import services from '@/services'
+import { useAccountStore } from '@/plugins/store';
+import Swal from 'sweetalert2'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const store = useAccountStore()
 import logo from '@images/logo.svg?raw'
 const form = {
   email: '',
@@ -22,11 +28,31 @@ const Signin = async () => {
 
       const response = await services.login(formSignin.value, auth)
       if (response.data.status === 'Successful') {
+        const expirationDate = new Date()
+        const token = response.data.data.token;
+        const newToken = await store.encryptAndStoreData(token)
+        expirationDate.setTime(expirationDate.getTime() + 1 * 60 * 60 * 1000)
+        Cookies.set('wataservices_token', newToken, {
+          expires: expirationDate,
+        });
+        router.push(`dashboard`)
+
       } else {
+        Swal.fire({
+          text: response.data.status,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        })
       }
-      console.log(response)
+      
     } catch (error) {
-      console.log(error.response.data.message)
+
+      Swal.fire({
+        title: error.response.data.status,
+        text: error.response.data.message,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      })
     }
   } else {
     console.log(valid)
@@ -38,10 +64,7 @@ const Signin = async () => {
   <!-- eslint-disable vue/no-v-html -->
 
   <div class="auth-wrapper d-flex align-center justify-center pa-4">
-    <VCard
-      class="auth-card pa-4 pt-7"
-      max-width="448"
-    >
+    <VCard class="auth-card pa-4 pt-7" max-width="448">
       <VCardItem class="justify-center">
         <template #prepend>
           <div class="d-flex">
@@ -62,47 +85,27 @@ const Signin = async () => {
           <VRow>
             <!-- email / username-->
             <VCol cols="12">
-              <VTextField
-                v-model="formSignin.email"
-                label="Email / Username"
-                type="text"
-                :rules="[v => !!v || 'โปรดกรอก Email / Username']"
-                required
-              />
+              <VTextField v-model="formSignin.email" label="Email / Username" type="text"
+                :rules="[v => !!v || 'โปรดกรอก Email / Username']" required />
             </VCol>
 
             <!-- password -->
             <VCol cols="12">
-              <VTextField
-                required
-                :rules="[v => !!v || 'โปรดกรอก Password']"
-                v-model="formSignin.password"
-                label="Password"
-                placeholder="············"
-                :type="isPasswordVisible ? 'text' : 'password'"
+              <VTextField required :rules="[v => !!v || 'โปรดกรอก Password']" v-model="formSignin.password"
+                label="Password" placeholder="············" :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
-                @click:append-inner="isPasswordVisible = !isPasswordVisible"
-              />
+                @click:append-inner="isPasswordVisible = !isPasswordVisible" />
 
               <!-- remember me checkbox -->
               <div class="d-flex align-center justify-space-between flex-wrap mt-1 mb-4">
-                <VCheckbox
-                  v-model="formSignin.remember"
-                  label="Remember me"
-                />
+                <VCheckbox v-model="formSignin.remember" label="Remember me" />
 
-                <a
-                  class="ms-2 mb-1"
-                  href="javascript:void(0)"
-                >
+                <a class="ms-2 mb-1" href="javascript:void(0)">
                   Forgot Password?
                 </a>
               </div>
 
-              <VBtn
-                block
-                @click="Signin()"
-              >
+              <VBtn block @click="Signin()">
                 Login
               </VBtn>
             </VCol>
