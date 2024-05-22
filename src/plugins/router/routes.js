@@ -48,6 +48,14 @@ export const routes = [
         component: () => import('@/pages/login.vue'),
       },
       {
+        path: 'signin',
+        component: () => import('@/pages/Signin.vue'),
+      },
+      {
+        path: 'logout',
+        component: () => import('@/pages/Logout.vue'),
+      },
+      {
         path: 'register',
         component: () => import('@/pages/register.vue'),
       },

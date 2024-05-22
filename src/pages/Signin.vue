@@ -7,12 +7,13 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const store = useAccountStore()
 import logo from '@images/logo.svg?raw'
+import { ref } from 'vue';
 const form = {
   email: '',
   password: '',
   remember: false,
 }
-
+const overlay = ref(false)
 const formRef = ref(null)
 const formSignin = ref(structuredClone(form))
 const isPasswordVisible = ref(false)
@@ -28,6 +29,7 @@ const Signin = async () => {
 
       const response = await services.login(formSignin.value, auth)
       if (response.data.status === 'Successful') {
+        overlay.value = true
         const expirationDate = new Date()
         const token = response.data.data.token;
         const newToken = await store.encryptAndStoreData(token)
@@ -35,7 +37,22 @@ const Signin = async () => {
         Cookies.set('wataservices_token', newToken, {
           expires: expirationDate,
         });
-        router.push(`dashboard`)
+      
+        const user = {
+          firstname : response.data.data.user.firstname,
+          lastname : response.data.data.user.lastname,
+          email : response.data.data.user.email,
+          image : response.data.data.user.image,
+          username : formSignin.value.email,
+          password : formSignin.value.password,
+          remember : formSignin.value.remember,
+        }
+      
+         const newUser =  store.encryptAndStoreData(user)
+         console.log(newUser)
+         store.dataUser = newUser
+
+         router.push(`dashboard`)
 
       } else {
         Swal.fire({
@@ -44,15 +61,15 @@ const Signin = async () => {
           confirmButtonText: 'OK'
         })
       }
-      
-    } catch (error) {
 
-      Swal.fire({
-        title: error.response.data.status,
-        text: error.response.data.message,
-        icon: 'error',
-        confirmButtonText: 'OK'
-      })
+    } catch (error) {
+      console.log(error)
+      // Swal.fire({
+      //   title: error.response.data.status,
+      //   text: error.response.data.message,
+      //   icon: 'error',
+      //   confirmButtonText: 'OK'
+      // })
     }
   } else {
     console.log(valid)
@@ -61,8 +78,15 @@ const Signin = async () => {
 </script>
 
 <template>
-  <!-- eslint-disable vue/no-v-html -->
-
+  <div class="text-center">
+    <v-overlay v-model="overlay" persistent class="align-center justify-center">
+      <v-progress-circular :size="90" :width="6" color="primary" indeterminate>
+        <template v-slot:default>
+          <span class="text-white"> Loading </span>
+        </template>
+      </v-progress-circular>
+    </v-overlay>
+  </div>
   <div class="auth-wrapper d-flex align-center justify-center pa-4">
     <VCard class="auth-card pa-4 pt-7" max-width="448">
       <VCardItem class="justify-center">

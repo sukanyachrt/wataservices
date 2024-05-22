@@ -1,30 +1,24 @@
 import axios from 'axios'
-import Cookies from 'js-cookie'
 const api_url = 'https://wata-api.sawasdeehub.tech/api/'
-
-export function authen() {
-  axios.interceptors.request.use(
-    config => {
-      if (Cookies.get('access_token')) {
-        config.headers['Authorization'] = 'Bearer ' + Cookies.get('access_token')
-        config.headers['Content-Type'] = 'application/json'
-        return config
-      } else {
-        window.location.href = '/wataservices/signin'
-      }
-    },
-    error => {
-      // Token expired
-      console.log(error)
-      window.location.href = '/signin'
-    },
-  )
-}
 
 export default {
   // === login ===
-  async login (databody,authconfig) {
+  async login (databody) {
     return await axios.post(api_url + `login`, databody)
+  },
+
+   // === logout ===
+   
+   async logout (auth) {
+   
+    return await axios.post(api_url + `logout`, auth)
+  },
+
+  // === platform ===
+   
+  async platforms (auth) {
+   
+    return await axios.get(api_url + `v1/platforms`, auth)
   },
 
 
