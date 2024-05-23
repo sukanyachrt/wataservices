@@ -33,7 +33,7 @@ const Signin = async () => {
         const expirationDate = new Date()
         const token = response.data.data.token;
         const newToken = await store.encryptAndStoreData(token)
-        expirationDate.setTime(expirationDate.getTime() + 1 * 60 * 60 * 1000)
+        expirationDate.setTime(expirationDate.getTime() + 365 * 24 * 60 * 60 * 1000)
         Cookies.set('wataservices_token', newToken, {
           expires: expirationDate,
         });

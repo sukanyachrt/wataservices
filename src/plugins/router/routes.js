@@ -9,6 +9,19 @@ export const routes = [
     component: () => import('@/layouts/default.vue'),
     children: [
       {
+        path: 'platforms',
+        component: () => import('@/views/platforms/Data.vue'),
+      },
+      {
+        path: 'platforms-create/:id?',
+        component: () => import('@/views/platforms/Create.vue'),
+      },
+      
+      {
+        path: 'services',
+        component: () => import('@/views/services/Data.vue'),
+      },
+      {
         path: 'dashboard',
         component: () => import('@/pages/dashboard.vue'),
       },

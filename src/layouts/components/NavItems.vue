@@ -5,8 +5,20 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
 
 <template>
  
-
-
+ <VerticalNavLink
+    :item="{
+      title: 'Platforms',
+      icon: 'ri-list-view',
+      to: '/platforms',
+    }"
+  />
+  <VerticalNavLink
+    :item="{
+      title: 'Services',
+      icon: 'ri-service-line',
+      to: '/services',
+    }"
+  />
   <VerticalNavLink
     :item="{
       title: 'Account Settings',
