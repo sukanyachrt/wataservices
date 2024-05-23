@@ -21,22 +21,23 @@ const linksPage = ref([])
 const metaPage = ref([])
 const serachSurvey = ref('')
 const myConfirmDelRef = ref(null)
+const page = ref(1)
 onMounted(async () => {
     await dataPlatforms()
 })
 const dataPlatforms = async () => {
     try {
-        overlay.value=true
+        overlay.value = true
         const response = await services.platforms(auth)
         console.log(response)
         if (response.status === 200) {
-            overlay.value=false
+            overlay.value = false
             platforms.value = response.data.data
             linksPage.value = response.data.links
             metaPage.value = response.data.meta
         }
-        else{
-            overlay.value=false
+        else {
+            overlay.value = false
         }
     } catch (error) {
         console.log(error)
@@ -65,7 +66,7 @@ const deletePlatforms = async item => { //ลบ
                         showConfirmButton: false,
                         timer: 2000
                     });
-                 await   dataPlatforms()
+                    await dataPlatforms()
                 }
                 else {
                     Swal.fire({
@@ -80,6 +81,9 @@ const deletePlatforms = async item => { //ลบ
             }
         }
     }
+}
+const test =()=>{
+    alert(page.value)
 }
 </script>
 <template>
@@ -156,13 +160,17 @@ const deletePlatforms = async item => { //ลบ
                 </tr>
             </tbody>
         </VTable>
+       
         <VCardText>
             <VRow>
                 <VCol md="6" class="text-end">
                     {{ metaPage }}
                 </VCol>
                 <VCol md="6" class="text-center">
-                    {{ linksPage }}
+                    <div class="text-center">
+                        <v-pagination v-model="page" @click="test()" :length="metaPage.last_page" next-icon="ri-arrow-right-s-fill"
+                            prev-icon="ri-arrow-left-s-fill"></v-pagination>
+                    </div>
                 </VCol>
             </VRow>
         </VCardText>
