@@ -8,53 +8,42 @@
             </v-progress-circular>
         </v-overlay>
     </div>
-    <VCard class="mt-6 border-t-xl border-primary border-opacity-100 border-4" title="เพิ่ม Platforms">
-        <VCardText>
-            <VForm ref="formCreateRef">
-                <VRow class="justify-center align-center">
-                    <VCol cols="12">
-                        <VTextField v-model="formCreate.name" required label="ชื่อของแพลตฟอร์ม"
-                            :rules="[v => !!v || 'โปรดกรอกชื่อของแพลตฟอร์ม']" />
-                    </VCol>
-                    <VCol cols="12">
-                        <VTextarea v-model="formCreate.description" label="คำอธิบายแพลตฟอร์มเพิ่มเติม" rows="2">
-                        </VTextarea>
-                    </VCol>
-                    <VCol cols="12" class="mt-6 text-center">
-                        <VBtn variant="tonal" @click="addPlatforms()" class="mx-4">
-                            <VIcon size="24" icon="ri-add-line" />
-                            บันทึกข้อมูล
-                        </VBtn>
-                        <VBtn variant="tonal" color="secondary" @click="reset()" class="mx-4">
-                            <VIcon size="24" icon="ri-restart-line" />
-                            ยกเลิก
-                        </VBtn>
-                    </VCol>
-                </VRow>
-            </VForm>
-        </VCardText>
+    <VDialog transition="dialog-top-transition" width="500" v-model="dialogVisible">
+        <VCard class="mt-6 border-t-xl border-primary border-opacity-100 border-4" title="เพิ่ม Platforms">
+            <VCardText>
+                <VForm ref="formCreateRef">
+                    <VRow class="justify-center align-center">
+                        <VCol cols="12">
+                            <VTextField v-model="formCreate.name" required label="ชื่อของแพลตฟอร์ม"
+                                :rules="[v => !!v || 'โปรดกรอกชื่อของแพลตฟอร์ม']" />
+                        </VCol>
+                        <VCol cols="12">
+                            <VTextarea v-model="formCreate.description" label="คำอธิบายแพลตฟอร์มเพิ่มเติม" rows="2">
+                            </VTextarea>
+                        </VCol>
+                        <VCol cols="12" class="mt-6 text-center">
+                            <VBtn variant="tonal" @click="addPlatforms()" class="mx-4">
+                                <VIcon size="24" icon="ri-add-line" />
+                                บันทึกข้อมูล
+                            </VBtn>
+                            <VBtn variant="tonal" color="secondary" @click="reset()" class="mx-4">
+                                <VIcon size="24" icon="ri-restart-line" />
+                                ยกเลิก
+                            </VBtn>
+                        </VCol>
+                    </VRow>
+                </VForm>
+            </VCardText>
 
 
-    </VCard>
-    <VRow>
-        <VCol cols="12" class="mt-6 text-center">
-            <router-link to="/platforms" class="mx-4">
-                <VBtn variant="tonal" color="secondary">
-                    <VIcon size="24" icon="ri-arrow-left-line" />
-                    กลุับ
-                </VBtn>
-            </router-link>
-        </VCol>
-    </VRow>
+        </VCard>
+    </VDialog>
+
 </template>
 <script setup>
 import Cookies from 'js-cookie'
 import services from '@/services'
 import Swal from 'sweetalert2'
-import { useRoute, useRouter } from 'vue-router'
-const router = useRouter()
-const route = useRoute()
-const Id = ref(route.params.id)
 import { useAccountStore } from '@/plugins/store';
 const store = useAccountStore()
 const newToken = store.decryptData(Cookies.get('wataservices_token'));
@@ -71,12 +60,32 @@ const form = {
     name: '',
     description: ''
 }
+const Id =ref('')
 const formCreate = ref(structuredClone(form));
-onMounted(async () => {
-    if (Id.value > 0) {
-        await platformsbyId()
+const dialogVisible = ref(false);
+const resolvePromise = ref()
+const rejectPromise = ref()
+const showForms = async data => {
+  dialogVisible.value = true
+  
+
+if(data){
+    Id.value=data.id
+    formCreate.value = {...data}
+}
+
+  return new Promise((resolve, reject) => {
+    resolvePromise.value = (data,type) => {
+      resolve({'status' : true , 'data' : data,'type' : type})
+      dialogVisible.value = false
     }
-})
+
+    rejectPromise.value = () => {
+      resolve({'status' : false})
+      dialogVisible.value = false
+    }
+  })
+}
 const addPlatforms = async () => {
     const { valid } = await formCreateRef.value.validate()
     if (valid) {
@@ -91,11 +100,13 @@ const addPlatforms = async () => {
             let response;
             if(Id.value){
                  response = await services.UpdatePlatforms(Id.value,databody, auth);
+                 resolvePromise.value(formCreate.value,'edit')
             }
             else{
                  response = await services.AddPlatforms(databody, auth);
+                 formCreate.value.id=response.data.data.id
+                 resolvePromise.value(formCreate.value,'add')
             }
-            console.log(response)
            
             if (response.data.status === "Successful") {
                 Swal.fire({
@@ -105,7 +116,8 @@ const addPlatforms = async () => {
                     showConfirmButton: false,
                     timer: 2000
                 });
-                router.push(`/platforms`)
+                overlay.value=false
+                
             }
             else {
                 overlay.value = false
@@ -122,32 +134,20 @@ const addPlatforms = async () => {
 
     }
 }
-const platformsbyId = async () => {
-    try {
-        overlay.value = true
-        const response = await services.platformsbyId(Id.value, auth);
-        if (response.data.status === "Successful") {
-            overlay.value = false
-            formCreate.value.name = response.data.data.name
-            formCreate.value.description = response.data.data.description
-        }
-        else {
-            verlay.value = false
-            Swal.fire({
-                text: response.data.message,
-                icon: 'error',
-                confirmButtonText: 'OK'
-            })
-        }
-    } catch (error) {
-        console.log(error)
-    }
-}
 const reset = async () => {
-    formCreate.value = await structuredClone(form);
+    rejectPromise.value()
+   await clearform();
+}
+
+const clearform=async ()=>{
+    Id.value=''
+    formCreate.value =  structuredClone(form);
     // รีเซ็ตฟอร์ม
     if (formCreateRef.value) {
         await formCreateRef.value.resetValidation();
     }
 }
+
+defineExpose({ showForms,clearform })
+
 </script>

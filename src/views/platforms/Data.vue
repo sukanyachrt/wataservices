@@ -1,6 +1,7 @@
 <script setup>
 import Swal from 'sweetalert2'
 import myDialog from '@/components/Dialog.vue'
+import PlatformsCreate from '@/views/platforms/Create.vue'
 import Cookies from 'js-cookie'
 import services from '@/services'
 import { useRouter } from 'vue-router'
@@ -21,15 +22,16 @@ const linksPage = ref([])
 const metaPage = ref([])
 const serachSurvey = ref('')
 const myConfirmDelRef = ref(null)
+const myCreateRef = ref(null)
+
 const page = ref(1)
 onMounted(async () => {
-    await dataPlatforms()
+    await dataPlatforms(1)
 })
-const dataPlatforms = async () => {
+const dataPlatforms = async (page) => {
     try {
         overlay.value = true
-        const response = await services.platforms(auth)
-        console.log(response)
+        const response = await services.platforms(page, auth)
         if (response.status === 200) {
             overlay.value = false
             platforms.value = response.data.data
@@ -82,8 +84,24 @@ const deletePlatforms = async item => { //ลบ
         }
     }
 }
-const test =()=>{
-    alert(page.value)
+const PaginationsPlatform = async () => {
+    await dataPlatforms(page.value)
+}
+
+const addPlatforms=async (item)=>{
+    if (myCreateRef.value) {
+        const clear = await myCreateRef.value.clearform();
+        const result = await myCreateRef.value.showForms(item);
+       if(result.status===true && result.type==='edit'){
+            item.name=result.data.name
+            item.description=result.data.description
+        }
+        else if(result.status===true && result.type==='add'){
+            await dataPlatforms(page.value)
+        } 
+        
+
+    }
 }
 </script>
 <template>
@@ -101,7 +119,7 @@ const test =()=>{
             <h1>Platforms</h1>
         </VCol>
         <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
-            <VBtn to="/platforms-create">
+            <VBtn @click="addPlatforms()">
                 <VIcon class="me-1" icon="ri-add-line" size="22" />
                 เพิ่ม Platforms
             </VBtn>
@@ -141,14 +159,14 @@ const test =()=>{
 
                     </td>
                     <td class="text-center">
-                        <VBtn link :to="`platforms-create/${item.id}`" icon color="default" size="x-small"
+                        <VBtn @click="addPlatforms(item)" icon color="warning" size="x-small"
                             variant="text">
                             <VIcon class="me-1" icon="ri-edit-box-line" size="22" />
                             <VTooltip activator="parent" location="top">
                                 แก้ไข Platforms
                             </VTooltip>
                         </VBtn>
-                        <VBtn @click="deletePlatforms(item)" icon color="default" size="x-small" variant="text">
+                        <VBtn @click="deletePlatforms(item)" icon  size="x-small" color="error" variant="text">
                             <VIcon class="me-1" icon="ri-delete-bin-6-line" size="22" />
                             <VTooltip activator="parent" location="top">
                                 ลบ Platforms
@@ -160,20 +178,22 @@ const test =()=>{
                 </tr>
             </tbody>
         </VTable>
-       
+
         <VCardText>
             <VRow>
-                <VCol md="6" class="text-end">
-                    {{ metaPage }}
+                <VCol md="8" class="text-end mt-3">
+                    Showing {{ metaPage.from }} to {{ metaPage.to }} of {{ metaPage.total }} entries
                 </VCol>
-                <VCol md="6" class="text-center">
-                    <div class="text-center">
-                        <v-pagination v-model="page" @click="test()" :length="metaPage.last_page" next-icon="ri-arrow-right-s-fill"
-                            prev-icon="ri-arrow-left-s-fill"></v-pagination>
-                    </div>
+                <VCol cols="12" md="4">
+
+                    <v-pagination v-model="page" @click="PaginationsPlatform()" :length="metaPage.last_page"
+                        next-icon="ri-arrow-right-s-fill" prev-icon="ri-arrow-left-s-fill"></v-pagination>
+
                 </VCol>
             </VRow>
         </VCardText>
     </VCard>
     <myDialog ref="myConfirmDelRef" />
+     <PlatformsCreate ref="myCreateRef" />
+    
 </template>

@@ -16,8 +16,8 @@ export default {
 
   // === platform ===
 
-  async platforms(auth) {
-    return await axios.get(api_url + `v1/platforms`, auth)
+  async platforms(page_number,auth) {
+    return await axios.get(api_url + `v1/platforms?page=${page_number}`, auth)
   },
   async platformsbyId(platform_id, auth) {
     return await axios.get(api_url + `v1/platforms/${platform_id}/edit`, auth)
