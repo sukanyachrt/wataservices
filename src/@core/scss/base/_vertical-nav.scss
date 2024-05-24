@@ -114,6 +114,7 @@
     .nav-link,
     .nav-group {
       overflow: hidden;
+      
 
       > :first-child {
         @extend %vertical-nav-item;
