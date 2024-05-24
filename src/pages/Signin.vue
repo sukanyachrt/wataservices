@@ -17,6 +17,13 @@ const overlay = ref(false)
 const formRef = ref(null)
 const formSignin = ref(structuredClone(form))
 const isPasswordVisible = ref(false)
+onMounted(async () => {
+  const loggedIn =await Cookies.get('wataservices_token')
+  if (loggedIn) {
+    router.push("/platforms");
+  }
+})
+
 const Signin = async () => {
   const { valid } = await formRef.value.validate()
   if (valid) {
@@ -37,22 +44,22 @@ const Signin = async () => {
         Cookies.set('wataservices_token', newToken, {
           expires: expirationDate,
         });
-      
-        const user = {
-          firstname : response.data.data.user.firstname,
-          lastname : response.data.data.user.lastname,
-          email : response.data.data.user.email,
-          image : response.data.data.user.image,
-          username : formSignin.value.email,
-          password : formSignin.value.password,
-          remember : formSignin.value.remember,
-        }
-      
-         const newUser =  store.encryptAndStoreData(user)
-         console.log(newUser)
-         store.dataUser = newUser
 
-         router.push(`dashboard`)
+        const user = {
+          firstname: response.data.data.user.firstname,
+          lastname: response.data.data.user.lastname,
+          email: response.data.data.user.email,
+          image: response.data.data.user.image,
+          username: formSignin.value.email,
+          password: formSignin.value.password,
+          remember: formSignin.value.remember,
+        }
+
+        const newUser = store.encryptAndStoreData(user)
+        console.log(newUser)
+        store.dataUser = newUser
+
+        router.push(`platforms`)
 
       } else {
         Swal.fire({
@@ -120,16 +127,9 @@ const Signin = async () => {
                 :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
                 @click:append-inner="isPasswordVisible = !isPasswordVisible" />
 
-              <!-- remember me checkbox -->
-              <div class="d-flex align-center justify-space-between flex-wrap mt-1 mb-4">
-                <VCheckbox v-model="formSignin.remember" label="Remember me" />
 
-                <a class="ms-2 mb-1" href="javascript:void(0)">
-                  Forgot Password?
-                </a>
-              </div>
 
-              <VBtn block @click="Signin()">
+              <VBtn block @click="Signin()" class="mt-4">
                 Login
               </VBtn>
             </VCol>

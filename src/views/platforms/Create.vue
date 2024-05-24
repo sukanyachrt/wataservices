@@ -9,7 +9,7 @@
         </v-overlay>
     </div>
     <VDialog transition="dialog-top-transition" width="500" v-model="dialogVisible">
-        <VCard class="mt-6 border-t-xl border-primary border-opacity-100 border-4" title="เพิ่ม Platforms">
+        <VCard class="mt-6 border-t-xl border-primary border-opacity-100 border-4" :title="Id=='' ? 'เพิ่ม Platforms': 'แก้ไข Platforms'">
             <VCardText>
                 <VForm ref="formCreateRef">
                     <VRow class="justify-center align-center">

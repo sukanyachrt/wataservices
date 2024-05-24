@@ -12,12 +12,7 @@ export const routes = [
         path: 'platforms',
         component: () => import('@/views/platforms/Data.vue'),
       },
-      {
-        path: 'platforms-create/:id?',
-        component: () => import('@/views/platforms/Create.vue'),
-      },
-      
-      {
+     {
         path: 'services',
         component: () => import('@/views/services/Data.vue'),
       },

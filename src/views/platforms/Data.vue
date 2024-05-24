@@ -68,7 +68,7 @@ const deletePlatforms = async item => { //ลบ
                         showConfirmButton: false,
                         timer: 2000
                     });
-                    await dataPlatforms()
+                    await dataPlatforms(page.value)
                 }
                 else {
                     Swal.fire({
@@ -77,7 +77,7 @@ const deletePlatforms = async item => { //ลบ
                         confirmButtonText: 'OK'
                     })
                 }
-                await dataPlatforms()
+                await dataPlatforms(page.value)
             } catch (error) {
                 console.log(error)
             }
@@ -88,18 +88,18 @@ const PaginationsPlatform = async () => {
     await dataPlatforms(page.value)
 }
 
-const addPlatforms=async (item)=>{
+const addPlatforms = async (item) => {
     if (myCreateRef.value) {
         const clear = await myCreateRef.value.clearform();
         const result = await myCreateRef.value.showForms(item);
-       if(result.status===true && result.type==='edit'){
-            item.name=result.data.name
-            item.description=result.data.description
+        if (result.status === true && result.type === 'edit') {
+            item.name = result.data.name
+            item.description = result.data.description
         }
-        else if(result.status===true && result.type==='add'){
+        else if (result.status === true && result.type === 'add') {
             await dataPlatforms(page.value)
-        } 
-        
+        }
+
 
     }
 }
@@ -159,14 +159,13 @@ const addPlatforms=async (item)=>{
 
                     </td>
                     <td class="text-center">
-                        <VBtn @click="addPlatforms(item)" icon color="warning" size="x-small"
-                            variant="text">
+                        <VBtn @click="addPlatforms(item)" icon color="warning" size="x-small" variant="text">
                             <VIcon class="me-1" icon="ri-edit-box-line" size="22" />
                             <VTooltip activator="parent" location="top">
                                 แก้ไข Platforms
                             </VTooltip>
                         </VBtn>
-                        <VBtn @click="deletePlatforms(item)" icon  size="x-small" color="error" variant="text">
+                        <VBtn @click="deletePlatforms(item)" icon size="x-small" color="error" variant="text">
                             <VIcon class="me-1" icon="ri-delete-bin-6-line" size="22" />
                             <VTooltip activator="parent" location="top">
                                 ลบ Platforms
@@ -178,22 +177,20 @@ const addPlatforms=async (item)=>{
                 </tr>
             </tbody>
         </VTable>
-
-        <VCardText>
-            <VRow>
-                <VCol md="8" class="text-end mt-3">
-                    Showing {{ metaPage.from }} to {{ metaPage.to }} of {{ metaPage.total }} entries
-                </VCol>
-                <VCol cols="12" md="4">
-
+        <VRow>
+            <VCol md="6" class="d-flex align-center justify-center justify-md-end">
+                Showing {{ metaPage.from }} to {{ metaPage.to }} of {{ metaPage.total }} entries
+            </VCol>
+            <VCol cols="12" md="6" class="d-flex align-center justify-end justify-md-end">
+                <v-container class="max-width">
                     <v-pagination v-model="page" @click="PaginationsPlatform()" :length="metaPage.last_page"
-                        next-icon="ri-arrow-right-s-fill" prev-icon="ri-arrow-left-s-fill"></v-pagination>
-
-                </VCol>
-            </VRow>
-        </VCardText>
+                        :total-visible="3" next-icon="ri-arrow-right-s-fill"
+                        prev-icon="ri-arrow-left-s-fill"></v-pagination>
+                </v-container>
+            </VCol>
+        </VRow>
     </VCard>
     <myDialog ref="myConfirmDelRef" />
-     <PlatformsCreate ref="myCreateRef" />
-    
+    <PlatformsCreate ref="myCreateRef" />
+
 </template>
