@@ -41,6 +41,22 @@ export default {
   async servicesCreate(auth) {
     return await axios.get(api_url + `v1/services/create`, auth)
   },
+  async servicesDetail(serives_id,auth) {
+    return await axios.get(api_url + `v1/services/${serives_id}/edit`, auth)
+  },
+  async servicesSave(databody,auth) {
+    return await axios.post(api_url + `v1/services`,databody, auth)
+  },
+  async servicesLogo(services_id,databody,auth) {
+    return await axios.patch(api_url + `v1/services/${services_id}/logo`,databody, auth)
+  },
+  async servicesDelete(services_id, auth) {
+    return await axios.delete(api_url + `v1/services/${services_id}`, auth)
+  },
+  async servicesUpdate(services_id,databody, auth) {
+    return await axios.patch(api_url + `v1/services/${services_id}`,databody, auth)
+  },
+
 
 
 }

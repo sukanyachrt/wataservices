@@ -58,7 +58,7 @@ const deleteServices = async item => { //ลบ
         if (result) {
             try {
 
-                const result = await services.deleteServices(item.id, auth)
+                const result = await services.servicesDelete(item.id, auth)
                 if (result.data.status === "Successful") {
                     Swal.fire({
                         position: "top-end",
