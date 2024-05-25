@@ -22,7 +22,6 @@ const linksPage = ref([])
 const metaPage = ref([])
 const serachSurvey = ref('')
 const myConfirmDelRef = ref(null)
-const myCreateRef = ref(null)
 
 const page = ref(1)
 onMounted(async () => {
@@ -88,22 +87,7 @@ const PaginationsPlatform = async () => {
     await getdataServices(page.value)
 }
 
-const addServices = async (item) => {
-    if (myCreateRef.value) {
-        const clear = await myCreateRef.value.clearform();
-        const result = await myCreateRef.value.showForms(item);
-        if (result.status === true && result.type === 'edit') {
-            item.name = result.data.name
-            item.detail = result.data.detail
-            item.logo = result.data.logo
-        }
-        else if (result.status === true && result.type === 'add') {
-            await dataServices(page.value)
-        }
 
-
-    }
-}
 </script>
 <template>
     <div class="text-center">
@@ -120,7 +104,7 @@ const addServices = async (item) => {
             <h1>Services</h1>
         </VCol>
         <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
-            <VBtn @click="addServices()">
+            <VBtn to="/services-create">
                 <VIcon class="me-1" icon="ri-add-line" size="22" />
                 เพิ่ม Services
             </VBtn>
@@ -130,15 +114,16 @@ const addServices = async (item) => {
         <VTable>
             <thead>
                 <tr>
+                    <th class="text-uppercase text-center">
+                        โลโก้
+                    </th>
                     <th class="text-uppercase">
                         ชื่อของบริการ
                     </th>
                     <th class="text-uppercase text-left">
                         รายละเอียดของบริการ
                     </th>
-                    <th class="text-uppercase text-center">
-                        โลโก้
-                    </th>
+                   
                     <th class="text-uppercase text-center">
                         วันที่สร้าง
                     </th>
@@ -151,25 +136,26 @@ const addServices = async (item) => {
 
             <tbody>
                 <tr v-for="item in dataservices" :key="item.id">
+                    <td class="text-center">
+                        <VAvatar v-if="item.logo !== ''" rounded="lg" size="60" class="me-6 my-2" :image="item.logo" />
+                        <template v-else>
+                            -
+                        </template>
+                    </td>
                     <td>
                         {{ item.name }}
                     </td>
                     <td class="text-left">
                         {{ item.detail }}
                     </td>
-                    <td class="text-center">
-                        <VAvatar v-if="item.logo !== ''" rounded="lg" size="60" class="me-6 mt-2" :image="item.logo" />
-                        <template v-else>
-                            -
-                        </template>
-                    </td>
+                    
 
                     <td class="text-center">
                         {{ formatDate(item.created_at) }}
 
                     </td>
                     <td class="text-center">
-                        <VBtn @click="addServices(item)" icon color="warning" size="x-small" variant="text">
+                        <VBtn :to="`/services-create/${item.id}`" icon color="warning" size="x-small" variant="text">
                             <VIcon class="me-1" icon="ri-edit-box-line" size="22" />
                             <VTooltip activator="parent" location="top">
                                 แก้ไข Services
@@ -202,6 +188,6 @@ const addServices = async (item) => {
         </VRow>
     </VCard>
     <myDialog ref="myConfirmDelRef" />
-    <ServicesCreate ref="myCreateRef" />
+    
 
 </template>

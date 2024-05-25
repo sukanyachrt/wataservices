@@ -38,6 +38,9 @@ export default {
   async services(page_number,auth) {
     return await axios.get(api_url + `v1/services?page=${page_number}`, auth)
   },
+  async servicesCreate(auth) {
+    return await axios.get(api_url + `v1/services/create`, auth)
+  },
 
 
 }

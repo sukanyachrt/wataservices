@@ -3,7 +3,7 @@ import Footer from '@/layouts/components/Footer.vue'
 import NavItems from '@/layouts/components/NavItems.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
-import logo from '@images/logo.svg?raw'
+import logowata from '@images/logowata.png'
 import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
 </script>
 
@@ -36,14 +36,9 @@ import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
         to="/"
         class="app-logo app-title-wrapper"
       >
-        <div
-          class="d-flex"
-          v-html="logo"
-        />
+      <VAvatar rounded="lg" size="100" :image="logowata" class="mx-4"/>
 
-        <h1 class="font-weight-medium leading-normal text-xl text-uppercase">
-          Materio
-        </h1>
+
       </RouterLink>
 
       <IconBtn

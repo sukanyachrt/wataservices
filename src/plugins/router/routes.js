@@ -17,6 +17,10 @@ export const routes = [
         component: () => import('@/views/services/Data.vue'),
       },
       {
+        path: 'services-create/:id?',
+        component: () => import('@/views/services/Create.vue'),
+      },
+      {
         path: 'dashboard',
         component: () => import('@/pages/dashboard.vue'),
       },
