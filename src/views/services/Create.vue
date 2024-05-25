@@ -50,7 +50,7 @@ const servicesDetail = async () => {
         overlay.value = true
         const response = await services.servicesDetail(Services_Id.value, auth);
         overlay.value = false
-        
+
         if (response.data.status === "Successful") {
             formCreate.value = response.data.data.service;
             logoForm.value.Notlogo = response.data.data.service.logo;
@@ -149,9 +149,12 @@ const addCoulunm = () => {
 const removeColunm = (index) => {
     formCreate.value.columns_.splice(index, 1)
 }
-const resetForm = () => {
+const resetForm =async () => {
     resetLogo()
     formCreate.value = structuredClone(form);
+    if (Services_Id.value) {
+        await servicesDetail();
+    }
 }
 const addServices = async () => {
     if (Services_Id.value) {
@@ -205,11 +208,11 @@ const UpdateServices = async () => {
     if (response.data.status === "Successful") {
         //insert image
         if (logoForm.value.logo !== '') {
-            
+
             await InsertLogo(response);
         }
         else {
-            
+
             Swal.fire({
                 position: "top-end",
                 icon: "success",
