@@ -19,7 +19,7 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
       to: '/services',
     }"
   />
-  <VerticalNavLink
+  <!-- <VerticalNavLink
     :item="{
       title: 'Account Settings',
       icon: 'ri-user-settings-line',
@@ -49,7 +49,6 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
     }"
   />
 
-  <!-- 👉 User Interface -->
   <VerticalNavSectionTitle
     :item="{
       heading: 'User Interface',
@@ -77,7 +76,6 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
     }"
   />
 
-  <!-- 👉 Forms & Tables -->
   <VerticalNavSectionTitle
     :item="{
       heading: 'Forms & Tables',
@@ -97,6 +95,6 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
       icon: 'ri-table-alt-line',
       to: '/tables',
     }"
-  />
+  /> -->
 
 </template>

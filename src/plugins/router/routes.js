@@ -1,9 +1,6 @@
 export const routes = [
-  // { path: '/', redirect: '/login' },
-  {
-    path: '/',
-    component: () => import('@/pages/Signin.vue'),
-  },
+  { path: '/', redirect: '/platforms' },
+
   {
     path: '/',
     component: () => import('@/layouts/default.vue'),
@@ -12,7 +9,7 @@ export const routes = [
         path: 'platforms',
         component: () => import('@/views/platforms/Data.vue'),
       },
-     {
+      {
         path: 'services',
         component: () => import('@/views/services/Data.vue'),
       },
