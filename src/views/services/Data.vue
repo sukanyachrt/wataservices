@@ -19,7 +19,6 @@ const router = useRouter()
 const dataservices = ref([]);
 const linksPage = ref([])
 const metaPage = ref([])
-const serachSurvey = ref('')
 const myConfirmDelRef = ref(null)
 
 const page = ref(1)
@@ -40,7 +39,23 @@ const getdataServices = async (page) => {
             overlay.value = false
         }
     } catch (error) {
-        console.log(error)
+        overlay.value = false
+        if (error) {
+            Swal.fire({
+                title: error.name,
+                text: error.message,
+                allowOutsideClick: false, // ไม่ให้ปิดโดยการคลิกภายนอก modal
+                allowEscapeKey: false, // ไม่ให้ปิดโดยการกดปุ่ม Esc
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push('/logout')
+                }
+            });
+
+          
+        }
     }
 }
 
@@ -82,8 +97,11 @@ const deleteServices = async item => { //ลบ
         }
     }
 }
-const PaginationsPlatform = async () => {
-    await getdataServices(page.value)
+const PaginationsServices = async () => {
+   
+    if (page.value !== metaPage.value.current_page) {
+        await getdataServices(page.value)
+    }
 }
 
 
@@ -179,7 +197,7 @@ const PaginationsPlatform = async () => {
             </VCol>
             <VCol cols="12" md="6" class="d-flex align-center justify-end justify-md-end">
                 <v-container class="max-width">
-                    <v-pagination v-model="page" @click="PaginationsPlatform()" :length="metaPage.last_page"
+                    <v-pagination v-model="page" @click="PaginationsServices()" :length="metaPage.last_page"
                         :total-visible="3" next-icon="ri-arrow-right-s-fill"
                         prev-icon="ri-arrow-left-s-fill"></v-pagination>
                 </v-container>

@@ -1,29 +1,58 @@
 export const routes = [
-  { path: '/', redirect: '/platforms' },
+  { path: '/', redirect: '/platforms', requiresAuth: true },
 
   {
     path: '/',
     component: () => import('@/layouts/default.vue'),
+    requiresAuth: true,
     children: [
       {
         path: 'platforms',
         component: () => import('@/views/platforms/Data.vue'),
+        meta: {
+          title: 'platforms',
+          requiresAuth: true,
+        },
       },
       {
         path: 'services',
         component: () => import('@/views/services/Data.vue'),
+        meta: {
+          title: 'services',
+          requiresAuth: true,
+        },
       },
       {
         path: 'services-create/:id?',
         component: () => import('@/views/services/Create.vue'),
+        meta: {
+          title: 'services-create',
+          requiresAuth: true,
+        },
       },
       {
         path: 'project',
         component: () => import('@/views/project/Data.vue'),
+        meta: {
+          title: 'project',
+          requiresAuth: true,
+        },
       },
       {
         path: 'project-create/:id?',
         component: () => import('@/views/project/Create.vue'),
+        meta: {
+          title: 'project-create',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'test',
+        component: () => import('@/views/test/Create.vue'),
+        meta: {
+          title: 'test',
+          requiresAuth: true,
+        },
       },
       {
         path: 'dashboard',

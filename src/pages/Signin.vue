@@ -75,12 +75,12 @@ const Signin = async () => {
     } catch (error) {
       overlay.value = false
       console.log(error)
-      // Swal.fire({
-      //   title: error.response.data.status,
-      //   text: error.response.data.message,
-      //   icon: 'error',
-      //   confirmButtonText: 'OK'
-      // })
+      Swal.fire({
+        title: error.name,
+        text: error.message,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      })
     }
   } else {
     console.log(valid)

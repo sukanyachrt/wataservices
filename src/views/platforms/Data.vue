@@ -20,7 +20,6 @@ const router = useRouter()
 const platforms = ref([]);
 const linksPage = ref([])
 const metaPage = ref([])
-const serachSurvey = ref('')
 const myConfirmDelRef = ref(null)
 const myCreateRef = ref(null)
 
@@ -42,10 +41,24 @@ const dataPlatforms = async (page) => {
             overlay.value = false
         }
     } catch (error) {
-        // if(error.response.status===401){
-        //     router.push('/logout')
-        // }
-        console.log(error)
+        
+        overlay.value = false
+        if (error) {
+            Swal.fire({
+                title: error.name,
+                text: error.message,
+                allowOutsideClick: false, // ไม่ให้ปิดโดยการคลิกภายนอก modal
+                allowEscapeKey: false, // ไม่ให้ปิดโดยการกดปุ่ม Esc
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    router.push('/logout')
+                }
+            });
+
+          
+        }
     }
 }
 
@@ -88,7 +101,10 @@ const deletePlatforms = async item => { //ลบ
     }
 }
 const PaginationsPlatform = async () => {
-    await dataPlatforms(page.value)
+    if (page.value !== metaPage.value.current_page) {
+        await dataPlatforms(page.value)
+    }
+   
 }
 
 const addPlatforms = async (item) => {

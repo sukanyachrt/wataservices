@@ -149,7 +149,7 @@ const addCoulunm = () => {
 const removeColunm = (index) => {
     formCreate.value.columns_.splice(index, 1)
 }
-const resetForm =async () => {
+const resetForm = async () => {
     resetLogo()
     formCreate.value = structuredClone(form);
     if (Services_Id.value) {
@@ -204,7 +204,6 @@ const UpdateServices = async () => {
     formCreate.value.columns = formCreate.value.columns_.map(column => column.id);
 
     const response = await services.servicesUpdate(Services_Id.value, formCreate.value, auth);
-    console.log(response)
     if (response.data.status === "Successful") {
         //insert image
         if (logoForm.value.logo !== '') {
@@ -265,9 +264,11 @@ const InsertLogo = async (response) => {
             </v-progress-circular>
         </v-overlay>
     </div>
+
     <div>
-        <h1>เพิ่ม Services</h1>
+        <h1>{{ Project_Id === "" ? 'เพิ่ม Services' : 'แก้ไข Services' }}</h1>
     </div>
+
     <VRow class="match-height align-center  justify-center mt-4">
         <VCol cols="12" md="10">
             <VCard>
@@ -293,7 +294,7 @@ const InsertLogo = async (response) => {
                             </div>
 
                             <p class="text-body-1 mb-0">
-                                Allowed JPG, GIF or PNG. Max size of 2MB
+                                Allowed jpg, jpeg, png. Max size of 2MB
                             </p>
                         </div>
                     </VCardText>
@@ -438,6 +439,13 @@ const InsertLogo = async (response) => {
     </VRow>
     <VRow>
         <VCol cols="12" class="mt-6 text-center">
+            <RouterLink :to="`/services`" icon color="secondary" size="x-small" variant="text">
+                <VBtn variant="tonal" color="secondary" class="mx-4">
+                    <VIcon class="me-1" icon="ri-arrow-left-line" size="22" />
+                    กลับ
+                </VBtn>
+
+            </RouterLink>
             <VBtn variant="tonal" @click="addServices()" class="mx-4">
                 <VIcon size="24" icon="ri-add-line" />
                 บันทึก Survices

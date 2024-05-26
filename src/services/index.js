@@ -1,14 +1,14 @@
 import axios from 'axios'
 const api_url = 'https://wata-api.sawasdeehub.tech/api/'
 import Cookies from 'js-cookie'
-export function checkCookie() {
+export async function checkCookie() {
   if (Cookies.get('wataservices_token')) {
 
     return true
   }
   else {
 
-    window.location.href = `/signin`
+    //window.location.href = `/signin`
   }
 
 }
@@ -32,6 +32,7 @@ export default {
 
       return await axios.get(api_url + `v1/platforms?page=${page_number}`, auth)
     }
+   
 
   },
   async platformsbyId(platform_id, auth) {

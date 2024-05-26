@@ -10,6 +10,7 @@ import { useAccountStore } from '@/plugins/store';
 import { useRouter, useRoute } from 'vue-router';
 const store = useAccountStore();
 const newToken = store.decryptData(Cookies.get('wataservices_token'));
+console.log(newToken)
 let auth = {
     headers: {
         'Content-Type': 'application/json',
@@ -77,6 +78,7 @@ onMounted(async () => {
     if (Project_Id.value) {
         await projectDetail();
     }
+    console.log(customers.value)
 })
 const getProjectCreate = async () => {
     try {
@@ -101,7 +103,6 @@ const projectDetail = async () => {
         overlay.value = true
         const response = await services.projectDetail(Project_Id.value, auth);
         overlay.value = false
-        console.log(response.data.data)
         if (response.data.status === "Successful") {
             formCreate.value = response.data.data.project;
             logoForm.value.Notlogo = response.data.data.project.logo;
@@ -194,6 +195,8 @@ const resetForm = async () => {
 
 
 const addProject = async () => {
+
+
     if (Project_Id.value) {
         const { valid } = await formCreateRef.value.validate()
         if (valid) {
@@ -238,21 +241,34 @@ const addProject = async () => {
 
 }
 const UpdateProject = async () => {
-    formCreate.value.pantip_job_id = formCreate.value.pantip_job_id.id
+    if (formCreate.value.pantip_job_id) {
+        if (formCreate.value.pantip_job_id.id) {
+            formCreate.value.pantip_job_id = formCreate.value.pantip_job_id.id
+        }
+
+    }
     if (formCreate.value.customer.id) {
+        console.log("ss")
         formCreate.value.customer = formCreate.value.customer
     }
     else {
         formCreate.value.customer = { "id": formCreate.value.customer };
     }
 
+    let customerId = formCreate.value.customer.id // ตัวแปรที่ต้องการตรวจสอบ
+    let isCustomerExist = customers.value.some(cust => cust.id === customerId)
+    console.log(isCustomerExist)
+    console.log(formCreate.value.customer)
+    if (isCustomerExist === false) {
+        let [firstname, lastname] = customerId.split(' ')
+        formCreate.value.customer = { firstname, lastname }
+    }
+
     let startingDateParts = await formCreate.value.starting_date1.split("-");
     formCreate.value.starting_date = `${startingDateParts[2]}-${startingDateParts[1]}-${startingDateParts[0]}`;
     let finishingDateParts = await formCreate.value.finishing_date1.split("-");
     formCreate.value.finishing_date = `${finishingDateParts[2]}-${finishingDateParts[1]}-${finishingDateParts[0]}`;
-    console.log(formCreate.value)
     const response = await services.projectUpdate(Project_Id.value, formCreate.value, auth);
-    console.log(response)
     if (response.data.status === "Successful") {
 
         if (logoForm.value.logo !== '') {
@@ -275,11 +291,21 @@ const UpdateProject = async () => {
 }
 
 const InsertProject = async () => {
-    formCreate.value.customer = { "id": formCreate.value.customer };
+    let customerId = formCreate.value.customer // ตัวแปรที่ต้องการตรวจสอบ
+    let isCustomerExist = customers.value.some(cust => cust.id === customerId)
+
+    if (!isCustomerExist) {
+        let [firstname, lastname] = customerId.split(' ')
+        formCreate.value.customer = { firstname, lastname }
+    } else {
+        formCreate.value.customer = { id: customerId }
+    }
+    console.log(formCreate.value)
     let startingDateParts = await formCreate.value.starting_date1.split("-");
     formCreate.value.starting_date = `${startingDateParts[2]}-${startingDateParts[1]}-${startingDateParts[0]}`;
     let finishingDateParts = await formCreate.value.finishing_date1.split("-");
     formCreate.value.finishing_date = `${finishingDateParts[2]}-${finishingDateParts[1]}-${finishingDateParts[0]}`;
+    console.log(formCreate.value)
     const response = await services.projectSave(formCreate.value, auth);
     if (response.data.status === "Successful") {
 
@@ -312,6 +338,36 @@ const InsertLogo = async (response) => {
         router.push('/project')
     }
 }
+
+const test = () => {
+    modalOpen.value = true
+}
+
+
+const modalOpen = ref(false)
+const newItem = ref({
+    firstname: '',
+    lastname: ''
+})
+
+
+
+const formCustomer = ref(null)
+
+const saveNewItem = async () => {
+
+    const { valid } = await formCustomer.value.validate()
+    if (valid) {
+        const fullName = `${newItem.value.firstname} ${newItem.value.lastname}`
+        customers.value.push({ id: customers.value.length + 1, name: fullName })
+        formCreate.value.customer = fullName
+        modalOpen.value = false
+
+
+    }
+
+}
+
 </script>
 <template>
     <div class="text-center">
@@ -324,7 +380,7 @@ const InsertLogo = async (response) => {
         </v-overlay>
     </div>
     <div>
-        <h1>เพิ่ม Project</h1>
+        <h1>{{ Project_Id === "" ? 'เพิ่ม Project' : 'แก้ไข Project' }}</h1>
     </div>
     <VRow class="match-height align-center  justify-center mt-4">
         <VCol cols="12" md="10">
@@ -351,7 +407,7 @@ const InsertLogo = async (response) => {
                             </div>
 
                             <p class="text-body-1 mb-0">
-                                Allowed JPG, GIF or PNG. Max size of 2MB
+                                Allowed jpg, jpeg, png. Max size of 2MB
                             </p>
                         </div>
                     </VCardText>
@@ -362,9 +418,64 @@ const InsertLogo = async (response) => {
                                     :rules="[v => !!v || 'โปรดกรอกชื่อของ project']" density="compact" />
                             </VCol>
                             <VCol cols="12" md="6">
-                                <VAutocomplete v-model="formCreate.customer" autocomplete="no" label="ชื่อของลูกค้า"
+                                <v-autocomplete v-model="formCreate.customer" :items="customers" label="ชื่อของลูกค้า"
+                                    autocomplete="no" item-title="name" item-value="id"
+                                    :rules="[v => !!v || 'โปรดเลือกชื่อของลูกค้า']" required density="compact">
+                                    <template #no-data>
+                                        <v-list-item>
+                                            <v-list-item-content>
+                                                <v-list-item-title v-if="formCreate.customer !== 'Add new'"
+                                                    @click="test">ไม่มีข้อมูลที่ต้องการ
+                                                    <VBtn size="x-small">
+                                                        <VIcon start icon="ri-add-line" />
+                                                        เพิ่มลูกค้า
+                                                    </VBtn>
+                                                </v-list-item-title>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </template>
+                                </v-autocomplete>
+
+                                <v-dialog v-model="modalOpen" max-width="400">
+                                    <VForm ref="formCustomer">
+                                        <v-card>
+                                            <v-card-title>เพิ่มข้อมูลลูกค้า</v-card-title>
+                                            <VDivider />
+                                            <v-card-text class="mt-4">
+                                                <VRow class="justify-center align-center">
+                                                    <VCol cols="12">
+                                                        <v-text-field v-model="newItem.firstname"
+                                                            :rules="[v => !!v || 'โปรดกรอกชื่อของลูกค้า']" required
+                                                            label="ชื่อลูกค้า"></v-text-field>
+                                                    </VCol>
+                                                    <VCol cols="12">
+                                                        <v-text-field v-model="newItem.lastname"
+                                                            :rules="[v => !!v || 'โปรดกรอกนามสกุลของลูกค้า']" required
+                                                            label="นามสกุลลูกค้า"></v-text-field>
+                                                    </VCol>
+                                                </VRow>
+
+
+                                            </v-card-text>
+                                            <VDivider />
+                                            <v-card-actions class="justify-center align-center my-2">
+                                                <VBtn variant="tonal" @click="saveNewItem" class="mx-4">
+                                                    <VIcon size="24" icon="ri-add-line" />
+                                                    บันทึกข้อมูล
+                                                </VBtn>
+                                                <VBtn variant="tonal" color="secondary" @click="modalOpen = false"
+                                                    class="mx-4">
+                                                    <VIcon size="24" icon="ri-restart-line" />
+                                                    ยกเลิก
+                                                </VBtn>
+
+                                            </v-card-actions>
+                                        </v-card>
+                                    </VForm>
+                                </v-dialog>
+                                <!-- <VAutocomplete v-model="formCreate.customer" autocomplete="no" label="ชื่อของลูกค้า"
                                     :items="customers" item-title="name" density="compact" item-value="id" required
-                                    :rules="[v => !!v || 'โปรดเลือกชื่อของลูกค้า']" />
+                                    :rules="[v => !!v || 'โปรดเลือกชื่อของลูกค้า']" /> -->
                             </VCol>
                             <VCol cols="12">
                                 <VTextField v-model="formCreate.detail" label="รายละเอียดของ project" density="compact">
@@ -467,8 +578,7 @@ const InsertLogo = async (response) => {
                             <VCol cols="12" md="6" class="mt-4">
                                 <VAutocomplete v-model="formCreate.pantip_job_id" autocomplete="no" :items="jobs"
                                     item-title="name" item-value="id" density="compact"
-                                    placeholder="link Pantip Bot Porject" required label="link Pantip Bot Porject"
-                                    :rules="[v => !!v || 'link Pantip Bot Porject']" />
+                                    placeholder="link Pantip Bot Porject" label="link Pantip Bot Porject" />
 
                             </VCol>
                         </VRow>
@@ -480,6 +590,14 @@ const InsertLogo = async (response) => {
     </VRow>
     <VRow>
         <VCol cols="12" class="mt-6 text-center">
+            <RouterLink :to="`/project`" icon color="secondary" size="x-small" variant="text">
+                <VBtn variant="tonal" color="secondary" class="mx-4">
+                    <VIcon class="me-1" icon="ri-arrow-left-line" size="22" />
+                    กลับ
+                </VBtn>
+
+            </RouterLink>
+
             <VBtn variant="tonal" class="mx-4" @click="addProject()">
                 <VIcon size="24" icon="ri-add-line" />
                 บันทึก Project
