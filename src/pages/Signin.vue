@@ -27,6 +27,7 @@ onMounted(async () => {
 const Signin = async () => {
   const { valid } = await formRef.value.validate()
   if (valid) {
+    overlay.value = true
     try {
       let auth = {
         headers: {
@@ -36,7 +37,7 @@ const Signin = async () => {
 
       const response = await services.login(formSignin.value, auth)
       if (response.data.status === 'Successful') {
-        overlay.value = true
+        
         const expirationDate = new Date()
         const token = response.data.data.token;
         const newToken = await store.encryptAndStoreData(token)
@@ -44,7 +45,7 @@ const Signin = async () => {
         Cookies.set('wataservices_token', newToken, {
           expires: expirationDate,
         });
-
+        console.log(response.data.data)
         const user = {
           firstname: response.data.data.user.firstname,
           lastname: response.data.data.user.lastname,
@@ -53,15 +54,17 @@ const Signin = async () => {
           username: formSignin.value.email,
           password: formSignin.value.password,
           remember: formSignin.value.remember,
+          userRole : response.data.data.user.userRole
         }
+        overlay.value = false
 
         const newUser = store.encryptAndStoreData(user)
-        console.log(newUser)
         store.dataUser = newUser
 
         router.push(`platforms`)
 
       } else {
+        overlay.value = false
         Swal.fire({
           text: response.data.status,
           icon: 'error',
@@ -70,6 +73,7 @@ const Signin = async () => {
       }
 
     } catch (error) {
+      overlay.value = false
       console.log(error)
       // Swal.fire({
       //   title: error.response.data.status,

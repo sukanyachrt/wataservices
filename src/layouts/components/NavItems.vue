@@ -19,6 +19,13 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
       to: '/services',
     }"
   />
+  <VerticalNavLink
+    :item="{
+      title: 'Project',
+      icon: 'ri-list-check-3',
+      to: '/project',
+    }"
+  />
   <!-- <VerticalNavLink
     :item="{
       title: 'Account Settings',

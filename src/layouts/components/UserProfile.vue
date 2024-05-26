@@ -1,5 +1,14 @@
 <script setup>
 import avatar1 from '@images/avatars/avatar-1.png';
+import { useAccountStore } from '@/plugins/store';
+const store = useAccountStore();
+const User =ref([])
+onMounted(async () => {
+  
+  const Userencrypt=store.decryptData(store.dataUser)
+  User.value= Userencrypt;
+ 
+})
 </script>
 
 <template>
@@ -48,9 +57,9 @@ import avatar1 from '@images/avatars/avatar-1.png';
             </template>
 
             <VListItemTitle class="font-weight-semibold">
-              John Doe
+              {{ User.firstname }} {{ User.lastname }}
             </VListItemTitle>
-            <VListItemSubtitle>Admin</VListItemSubtitle>
+            <VListItemSubtitle>{{ User.userRole }}</VListItemSubtitle>
           </VListItem>
           <VDivider class="my-2" />
 

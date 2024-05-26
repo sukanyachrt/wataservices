@@ -33,10 +33,13 @@ const logout = async () => {
       .catch((error) => {
         console.log(error);
         router.push(`signin`)
+        Cookies.remove('wataservices_token')
       });
 
   } catch (error) {
+    router.push(`signin`)
     console.log(error)
+    Cookies.remove('wataservices_token')
   }
 }
 

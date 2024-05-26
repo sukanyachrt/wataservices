@@ -42,6 +42,9 @@ const dataPlatforms = async (page) => {
             overlay.value = false
         }
     } catch (error) {
+        // if(error.response.status===401){
+        //     router.push('/logout')
+        // }
         console.log(error)
     }
 }

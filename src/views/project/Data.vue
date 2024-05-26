@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 import services from '@/services'
 import { useRouter } from 'vue-router'
 import { useAccountStore } from '@/plugins/store';
-import { formatDate } from '@/plugins/function.js'
+import { formatDate_notime } from '@/plugins/function.js'
 const store = useAccountStore();
 const newToken = store.decryptData(Cookies.get('wataservices_token'));
 let auth = {
@@ -15,24 +15,23 @@ let auth = {
     },
 }
 const overlay = ref(false)
-const router = useRouter()
-const dataservices = ref([]);
+const dataprojects = ref([]);
 const linksPage = ref([])
 const metaPage = ref([])
-const serachSurvey = ref('')
 const myConfirmDelRef = ref(null)
 
 const page = ref(1)
 onMounted(async () => {
-    await getdataServices(1)
+    await getdataProjects(1)
 })
-const getdataServices = async (page) => {
+const getdataProjects = async (page) => {
     try {
         overlay.value = true
-        const response = await services.services(page, auth)
+        const response = await services.projects(page, auth);
+        console.log(response)
         if (response.status === 200) {
             overlay.value = false
-            dataservices.value = response.data.data
+            dataprojects.value = response.data.data
             linksPage.value = response.data.links
             metaPage.value = response.data.meta
         }
@@ -45,7 +44,7 @@ const getdataServices = async (page) => {
 }
 
 
-const deleteServices = async item => { //ลบ
+const deleteProject = async item => { //ลบ
     if (myConfirmDelRef.value) {
         const result = await myConfirmDelRef.value.showDialog({
             text: 'ยืนยันการลบข้อมูล !',
@@ -57,7 +56,7 @@ const deleteServices = async item => { //ลบ
         if (result) {
             try {
 
-                const result = await services.servicesDelete(item.id, auth)
+                const result = await services.projectDelete(item.id, auth)
                 if (result.data.status === "Successful") {
                     Swal.fire({
                         position: "top-end",
@@ -66,7 +65,7 @@ const deleteServices = async item => { //ลบ
                         showConfirmButton: false,
                         timer: 2000
                     });
-                    await getdataServices(page.value)
+                    await getdataProjects(page.value)
                 }
                 else {
                     Swal.fire({
@@ -75,7 +74,7 @@ const deleteServices = async item => { //ลบ
                         confirmButtonText: 'OK'
                     })
                 }
-                await getdataServices(page.value)
+                await getdataProjects(page.value)
             } catch (error) {
                 console.log(error)
             }
@@ -83,7 +82,7 @@ const deleteServices = async item => { //ลบ
     }
 }
 const PaginationsPlatform = async () => {
-    await getdataServices(page.value)
+    await getdataProjects(page.value)
 }
 
 
@@ -100,12 +99,12 @@ const PaginationsPlatform = async () => {
     </div>
     <VRow>
         <VCol cols="12" md="6">
-            <h1>Services</h1>
+            <h1>Project</h1>
         </VCol>
         <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
-            <VBtn to="/services-create">
+            <VBtn to="/project-create">
                 <VIcon class="me-1" icon="ri-add-line" size="22" />
-                เพิ่ม Services
+                เพิ่ม Project
             </VBtn>
         </VCol>
     </VRow>
@@ -116,13 +115,18 @@ const PaginationsPlatform = async () => {
                     <th class="text-uppercase text-center">
                         โลโก้
                     </th>
+                    <th class="text-uppercase text-center">
+                        ชื่อ
+                    </th>
                     <th class="text-uppercase">
-                        ชื่อของบริการ
+                        รายละเอียด
                     </th>
                     <th class="text-uppercase text-left">
-                        รายละเอียดของบริการ
+                        วันที่เริ่ม-สิ้นสุดโครงการ
                     </th>
-                   
+                    <th class="text-uppercase text-center">
+                        ชื่อของลูกค้า
+                    </th>
                     <th class="text-uppercase text-center">
                         วันที่สร้าง
                     </th>
@@ -134,36 +138,42 @@ const PaginationsPlatform = async () => {
             </thead>
 
             <tbody>
-                <tr v-for="item in dataservices" :key="item.id">
+                <tr v-for="item in dataprojects" :key="item.id">
                     <td class="text-center">
                         <VAvatar v-if="item.logo !== ''" rounded="lg" size="60" class="me-6 my-2" :image="item.logo" />
                         <template v-else>
                             -
                         </template>
                     </td>
-                    <td>
+                    <td class="text-left">
                         {{ item.name }}
                     </td>
                     <td class="text-left">
                         {{ item.detail }}
                     </td>
-                    
-
+                    <td class="text-left">
+                        <span>เริ่มต้น : {{ formatDate_notime(item.starting_date) }}</span><br/>
+                        <span>สิ้นสุด : {{ formatDate_notime(item.finishing_date) }}</span>
+                        
+                    </td>
+                    <td class="text-left">
+                        {{ item.customer.name }}
+                    </td>
                     <td class="text-center">
-                        {{ formatDate(item.created_at) }}
+                        {{ formatDate_notime(item.created_at) }}
 
                     </td>
                     <td class="text-center">
-                        <VBtn :to="`/services-create/${item.id}`" icon color="warning" size="x-small" variant="text">
+                        <VBtn :to="`/project-create/${item.id}`" icon color="warning" size="x-small" variant="text">
                             <VIcon class="me-1" icon="ri-edit-box-line" size="22" />
                             <VTooltip activator="parent" location="top">
-                                แก้ไข Services
+                                แก้ไข Project
                             </VTooltip>
                         </VBtn>
-                        <VBtn @click="deleteServices(item)" icon size="x-small" color="error" variant="text">
+                        <VBtn @click="deleteProject(item)" icon size="x-small" color="error" variant="text">
                             <VIcon class="me-1" icon="ri-delete-bin-6-line" size="22" />
                             <VTooltip activator="parent" location="top">
-                                ลบ Services
+                                ลบ Project
                             </VTooltip>
                         </VBtn>
 
