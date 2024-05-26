@@ -339,7 +339,7 @@ const InsertLogo = async (response) => {
     }
 }
 
-const test = () => {
+const showModal = () => {
     modalOpen.value = true
 }
 
@@ -412,6 +412,7 @@ const saveNewItem = async () => {
                         </div>
                     </VCardText>
                     <VCardText>
+                        {{ customers.length }}
                         <VRow class="justify-center align-center">
                             <VCol cols="12" md="6">
                                 <VTextField v-model="formCreate.name" required label="ชื่อของ project"
@@ -421,11 +422,18 @@ const saveNewItem = async () => {
                                 <v-autocomplete v-model="formCreate.customer" :items="customers" label="ชื่อของลูกค้า"
                                     autocomplete="no" item-title="name" item-value="id"
                                     :rules="[v => !!v || 'โปรดเลือกชื่อของลูกค้า']" required density="compact">
+                                    <template #append-inner>
+                                        <VBtn size="x-small" @click="showModal" variant="tonal" v-if="customers.length <= 10">
+                                            <VIcon start icon="ri-add-line" />
+                                            เพิ่มลูกค้า
+                                        </VBtn>
+                                        
+                                    </template>
                                     <template #no-data>
-                                        <v-list-item>
+                                        <v-list-item v-if="formCreate.customer !== 'Add new'">
                                             <v-list-item-content>
-                                                <v-list-item-title v-if="formCreate.customer !== 'Add new'"
-                                                    @click="test">ไม่มีข้อมูลที่ต้องการ
+                                                <v-list-item-title @click="showModal">
+                                                    ไม่มีข้อมูลที่ต้องการ
                                                     <VBtn size="x-small">
                                                         <VIcon start icon="ri-add-line" />
                                                         เพิ่มลูกค้า
@@ -435,6 +443,8 @@ const saveNewItem = async () => {
                                         </v-list-item>
                                     </template>
                                 </v-autocomplete>
+
+
 
                                 <v-dialog v-model="modalOpen" max-width="400">
                                     <VForm ref="formCustomer">
@@ -473,9 +483,7 @@ const saveNewItem = async () => {
                                         </v-card>
                                     </VForm>
                                 </v-dialog>
-                                <!-- <VAutocomplete v-model="formCreate.customer" autocomplete="no" label="ชื่อของลูกค้า"
-                                    :items="customers" item-title="name" density="compact" item-value="id" required
-                                    :rules="[v => !!v || 'โปรดเลือกชื่อของลูกค้า']" /> -->
+
                             </VCol>
                             <VCol cols="12">
                                 <VTextField v-model="formCreate.detail" label="รายละเอียดของ project" density="compact">
@@ -542,8 +550,9 @@ const saveNewItem = async () => {
 
                                                 <VTextField v-model="option.credit" :model-value="option.credit"
                                                     placeholder="กรอกจำนวน credit ในบริการ" variant="outlined"
-                                                    density="compact" @focus="$event.target.select()" required
-                                                    class="my-2" :rules="[v => !!v || 'โปรดกรอกจำนวน credit ในบริการ']">
+                                                    type="number" autocomplete="no" density="compact"
+                                                    @focus="$event.target.select()" required class="my-2"
+                                                    :rules="[v => !!v || 'โปรดกรอกจำนวน credit ในบริการ']">
                                                 </VTextField>
 
                                             </td>
@@ -569,7 +578,7 @@ const saveNewItem = async () => {
                             </VCol>
                             <VDivider />
                             <VCol cols="12" md="6" class="mt-4">
-                                <VTextField required :rules="[v => !!v || 'โปรดกรอก Password']"
+                                <VTextField required :rules="[v => !!v || 'โปรดกรอก Password']" autocomplete="no"
                                     v-model="formCreate.passcode" label="Password" placeholder="············"
                                     :type="isPasswordVisible ? 'text' : 'password'" density="compact"
                                     :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
