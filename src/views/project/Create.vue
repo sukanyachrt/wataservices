@@ -412,8 +412,7 @@ const saveNewItem = async () => {
                         </div>
                     </VCardText>
                     <VCardText>
-                        {{ customers.length }}
-                        <VRow class="justify-center align-center">
+                         <VRow class="justify-center align-center">
                             <VCol cols="12" md="6">
                                 <VTextField v-model="formCreate.name" required label="ชื่อของ project"
                                     :rules="[v => !!v || 'โปรดกรอกชื่อของ project']" density="compact" />
