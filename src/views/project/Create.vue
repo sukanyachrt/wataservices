@@ -570,7 +570,7 @@ const saveNewItem = async () => {
 
                                     <VBtn variant="outlined" @click="addServices()">
                                         <VIcon start icon="ri-add-circle-line" />
-                                        เพิ่มสถานะ
+                                        เพิ่มบริการ
                                     </VBtn>
                                 </div>
 
@@ -586,6 +586,7 @@ const saveNewItem = async () => {
                             <VCol cols="12" md="6" class="mt-4">
                                 <VAutocomplete v-model="formCreate.pantip_job_id" autocomplete="no" :items="jobs"
                                     item-title="name" item-value="id" density="compact"
+                                    clearable 
                                     placeholder="link Pantip Bot Porject" label="link Pantip Bot Porject" />
 
                             </VCol>
