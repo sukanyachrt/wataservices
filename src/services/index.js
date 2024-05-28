@@ -32,7 +32,7 @@ export default {
 
       return await axios.get(api_url + `v1/platforms?page=${page_number}`, auth)
     }
-   
+
 
   },
   async platformsbyId(platform_id, auth) {
@@ -148,6 +148,26 @@ export default {
       return await axios.delete(api_url + `v1/projects/${project_id}`, auth)
     }
   },
+  // === teams ===
+  async teams(page_number, auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/teams?page=${page_number}`, auth)
+    }
+  },
+  async teamsDetail(team_id, auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/teams/${team_id}/edit`, auth)
+    }
+  },
+  async teamsSave(databody, auth) {
+    if (checkCookie()) {
+      return await axios.post(api_url + `v1/teams`, databody, auth)
+    }
+  },
+  async teamsUpdate(team_id, databody, auth) {
+    if (checkCookie()) {
+      return await axios.patch(api_url + `v1/teams/${team_id}`, databody, auth)
+    }
 
-
+  },
 }

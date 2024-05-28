@@ -26,6 +26,13 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
       to: '/project',
     }"
   />
+  <VerticalNavLink
+    :item="{
+      title: 'Team ',
+      icon: 'ri-team-line',
+      to: '/teams',
+    }"
+  />
   <!-- <VerticalNavLink
     :item="{
       title: 'Account Settings',

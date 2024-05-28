@@ -47,6 +47,22 @@ export const routes = [
         },
       },
       {
+        path: 'teams',
+        component: () => import('@/views/teams/Data.vue'),
+        meta: {
+          title: 'teams',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'teams-create/:id?',
+        component: () => import('@/views/teams/Create.vue'),
+        meta: {
+          title: 'project-create',
+          requiresAuth: true,
+        },
+      },
+      {
         path: 'test',
         component: () => import('@/views/test/Create.vue'),
         meta: {

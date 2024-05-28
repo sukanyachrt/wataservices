@@ -1,12 +1,11 @@
 <script setup>
 import Swal from 'sweetalert2'
 import myDialog from '@/components/Dialog.vue'
-import PlatformsCreate from '@/views/platforms/Create.vue'
 import Cookies from 'js-cookie'
 import services from '@/services'
 import { useRouter } from 'vue-router'
 import { useAccountStore } from '@/plugins/store';
-import { formatDate } from '@/plugins/function.js'
+import { formatDate_notime } from '@/plugins/function.js'
 const store = useAccountStore();
 const newToken = store.decryptData(Cookies.get('wataservices_token'));
 let auth = {
@@ -16,24 +15,22 @@ let auth = {
     },
 }
 const overlay = ref(false)
-const router = useRouter()
-const platforms = ref([]);
+const dataTeams = ref([]);
 const linksPage = ref([])
 const metaPage = ref([])
 const myConfirmDelRef = ref(null)
-const myCreateRef = ref(null)
 
 const page = ref(1)
 onMounted(async () => {
-    await dataPlatforms(1)
+    await getdataTeams(1)
 })
-const dataPlatforms = async (page) => {
+const getdataTeams = async (page) => {
     try {
         overlay.value = true
-        const response = await services.platforms(page, auth)
+        const response = await services.teams(page, auth);
         if (response.status === 200) {
             overlay.value = false
-            platforms.value = response.data.data
+            dataTeams.value = response.data.data
             linksPage.value = response.data.links
             metaPage.value = response.data.meta
         }
@@ -41,13 +38,11 @@ const dataPlatforms = async (page) => {
             overlay.value = false
         }
     } catch (error) {
-
         overlay.value = false
         if (error) {
-            console.log(error)
             Swal.fire({
-                title: error.response.data.status,
-                text: error.response.data.message,
+                title: error.name,
+                text: error.message,
                 allowOutsideClick: false, // ไม่ให้ปิดโดยการคลิกภายนอก modal
                 allowEscapeKey: false, // ไม่ให้ปิดโดยการกดปุ่ม Esc
                 icon: 'warning',
@@ -58,13 +53,13 @@ const dataPlatforms = async (page) => {
                 }
             });
 
-
+          
         }
     }
 }
 
 
-const deletePlatforms = async item => { //ลบ
+const deleteTeams = async item => { //ลบ
     if (myConfirmDelRef.value) {
         const result = await myConfirmDelRef.value.showDialog({
             text: 'ยืนยันการลบข้อมูล !',
@@ -76,7 +71,7 @@ const deletePlatforms = async item => { //ลบ
         if (result) {
             try {
 
-                const result = await services.DeletePlatforms(item.id, auth)
+                const result = await services.projectDelete(item.id, auth)
                 if (result.data.status === "Successful") {
                     Swal.fire({
                         position: "top-end",
@@ -85,45 +80,30 @@ const deletePlatforms = async item => { //ลบ
                         showConfirmButton: false,
                         timer: 2000
                     });
-                    await dataPlatforms(page.value)
+                    await getdataTeams(page.value)
                 }
                 else {
                     Swal.fire({
-                        title: error.response.data.status,
-                        text: error.response.data.message,
+                        text: result.data.message,
                         icon: 'error',
                         confirmButtonText: 'OK'
                     })
                 }
-                await dataPlatforms(page.value)
+                await getdataTeams(page.value)
             } catch (error) {
                 console.log(error)
             }
         }
     }
 }
-const PaginationsPlatform = async () => {
+const PaginationsProject = async () => {
     if (page.value !== metaPage.value.current_page) {
-        await dataPlatforms(page.value)
+        await getdataTeams(page.value)
     }
-
+    
 }
 
-const addPlatforms = async (item) => {
-    if (myCreateRef.value) {
-        const clear = await myCreateRef.value.clearform();
-        const result = await myCreateRef.value.showForms(item);
-        if (result.status === true && result.type === 'edit') {
-            item.name = result.data.name
-            item.description = result.data.description
-        }
-        else if (result.status === true && result.type === 'add') {
-            await dataPlatforms(page.value)
-        }
 
-
-    }
-}
 </script>
 <template>
     <div class="text-center">
@@ -137,12 +117,12 @@ const addPlatforms = async (item) => {
     </div>
     <VRow>
         <VCol cols="12" md="6">
-            <h1>Platforms</h1>
+            <h1>Teams</h1>
         </VCol>
         <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
-            <VBtn @click="addPlatforms()">
+            <VBtn to="/teams-create">
                 <VIcon class="me-1" icon="ri-add-line" size="22" />
-                เพิ่ม Platforms
+                เพิ่ม Teams
             </VBtn>
         </VCol>
     </VRow>
@@ -150,14 +130,14 @@ const addPlatforms = async (item) => {
         <VTable>
             <thead>
                 <tr>
-                    <th class="text-uppercase">
-                        ชื่อของแพลตฟอร์ม
-                    </th>
-                    <th class="text-uppercase text-left">
-                        รายละเอียดของแพลตฟอร์ม
+                    <th class="text-uppercase text-center">
+                        รูปภาพ
                     </th>
                     <th class="text-uppercase text-center">
-                        วันที่สร้าง
+                        ชื่อของ user
+                    </th>
+                    <th class="text-uppercase">
+                        รายละเอียดของ user
                     </th>
                     <th class="text-uppercase text-center">
                         #
@@ -167,29 +147,29 @@ const addPlatforms = async (item) => {
             </thead>
 
             <tbody>
-                <tr v-for="item in platforms" :key="item.id">
-                    <td>
+                <tr v-for="item in dataTeams" :key="item.id">
+                    <td class="text-center">
+                        <VAvatar v-if="item.image !== ''" rounded="lg" size="60" class="me-6 my-2" :image="item.image" />
+                        
+                    </td>
+                    <td class="text-left">
                         {{ item.name }}
                     </td>
                     <td class="text-left">
-                        {{ item.description }}
+                        {{ item.note }}
                     </td>
-
+                    
                     <td class="text-center">
-                        {{ formatDate(item.created_at) }}
-
-                    </td>
-                    <td class="text-center">
-                        <VBtn @click="addPlatforms(item)" icon color="warning" size="x-small" variant="text">
+                        <VBtn :to="`/teams-create/${item.id}`" icon color="warning" size="x-small" variant="text">
                             <VIcon class="me-1" icon="ri-edit-box-line" size="22" />
                             <VTooltip activator="parent" location="top">
-                                แก้ไข Platforms
+                                แก้ไข Teams
                             </VTooltip>
                         </VBtn>
-                        <VBtn @click="deletePlatforms(item)" icon size="x-small" color="error" variant="text">
+                        <VBtn @click="deleteTeams(item)" icon size="x-small" color="error" variant="text">
                             <VIcon class="me-1" icon="ri-delete-bin-6-line" size="22" />
                             <VTooltip activator="parent" location="top">
-                                ลบ Platforms
+                                ลบ Teams
                             </VTooltip>
                         </VBtn>
 
@@ -198,13 +178,14 @@ const addPlatforms = async (item) => {
                 </tr>
             </tbody>
         </VTable>
+
         <VRow>
             <VCol md="6" class="d-flex align-center justify-center justify-md-end">
                 Showing {{ metaPage.from }} to {{ metaPage.to }} of {{ metaPage.total }} entries
             </VCol>
             <VCol cols="12" md="6" class="d-flex align-center justify-end justify-md-end">
                 <v-container class="max-width">
-                    <v-pagination v-model="page" @click="PaginationsPlatform()" :length="metaPage.last_page"
+                    <v-pagination v-model="page" @click="PaginationsProject()" :length="metaPage.last_page"
                         :total-visible="3" next-icon="ri-arrow-right-s-fill"
                         prev-icon="ri-arrow-left-s-fill"></v-pagination>
                 </v-container>
@@ -212,6 +193,6 @@ const addPlatforms = async (item) => {
         </VRow>
     </VCard>
     <myDialog ref="myConfirmDelRef" />
-    <PlatformsCreate ref="myCreateRef" />
+    
 
 </template>
