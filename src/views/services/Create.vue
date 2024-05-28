@@ -27,7 +27,7 @@ const form = {
     name: '',
     detail: '',
     note: '',
-    statuses: [{ name: '', color: '#000', type: false }],
+    statuses: [{ name: 'สำเร็จ', color: '#05a045', type: true },{ name: 'กำลังดำเนินงาน', color: '#fcc02e', type: false },{ name: 'ล้มเหลว', color: '#f50707', type: false }],
     columns_: [{}],
     columns: []
 }
