@@ -71,7 +71,7 @@ const deleteTeams = async item => { //ลบ
         if (result) {
             try {
 
-                const result = await services.projectDelete(item.id, auth)
+                const result = await services.teamsDelete(item.id, auth)
                 if (result.data.status === "Successful") {
                     Swal.fire({
                         position: "top-end",

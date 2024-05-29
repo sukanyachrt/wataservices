@@ -173,6 +173,10 @@ export default {
     if (checkCookie()) {
       return await axios.patch(api_url + `v1/teams/${team_id}/avatar`, databody, auth)
     }
-
+  },
+  async teamsDelete(team_id, auth) {
+    if (checkCookie()) {
+      return await axios.delete(api_url + `v1/teams/${team_id}`, auth)
+    }
   },
 }
