@@ -44,7 +44,6 @@ const teamsDetail = async () => {
     try {
         overlay.value = true
         const response = await services.teamsDetail(teams_Id.value, auth);
-        console.log(response)
         overlay.value = false
         if (response.data.status === "Successful") {
             ImageForm.value.NotImage = response.data.data.image
@@ -85,7 +84,6 @@ const addTeams = async () => {
 const InsertTeams = async () => {
     try {
         const response = await services.teamsSave(formCreate.value, auth);
-        console.log(response)
         if (response.data.status === "Successful") {
             if (ImageForm.value.image !== "") {
                 await InsertImage(response);
