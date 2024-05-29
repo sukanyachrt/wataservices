@@ -168,6 +168,11 @@ export default {
     if (checkCookie()) {
       return await axios.patch(api_url + `v1/teams/${team_id}`, databody, auth)
     }
+  },
+  async teamsAvatar(team_id, databody, auth) {
+    if (checkCookie()) {
+      return await axios.patch(api_url + `v1/teams/${team_id}/avatar`, databody, auth)
+    }
 
   },
 }

@@ -28,6 +28,7 @@ const form = {
     password: ''
 }
 const formCreate = ref(structuredClone(form));
+const initialFormState = ref(structuredClone(form));
 const imageData = {
     "image": '',
     "NotImage": Notlogo
@@ -46,7 +47,9 @@ const teamsDetail = async () => {
         console.log(response)
         overlay.value = false
         if (response.data.status === "Successful") {
+            ImageForm.value.NotImage = response.data.data.image
             formCreate.value = response.data.data
+            initialFormState.value = structuredClone(response.data.data);
 
         }
     } catch (error) {
@@ -67,11 +70,16 @@ const addTeams = async () => {
                 console.log("yes")
                 await InsertTeams()
             }
-           
+
 
         }
     } catch (error) {
-        console.log(error)
+
+        Swal.fire({
+            text: error.response.data.message,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        })
     }
 }
 const InsertTeams = async () => {
@@ -79,40 +87,110 @@ const InsertTeams = async () => {
         const response = await services.teamsSave(formCreate.value, auth);
         console.log(response)
         if (response.data.status === "Successful") {
-            Swal.fire({
-                position: "top-end",
-                icon: "success",
-                title: response.data.message,
-                showConfirmButton: false,
-                timer: 2000
-            });
-            router.push('/teams')
+            if (ImageForm.value.image !== "") {
+                await InsertImage(response);
+            }
+            else {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: response.data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                router.push('/teams')
+            }
+
 
         }
     } catch (error) {
-
+        Swal.fire({
+            text: error.response.data.message,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        })
     }
 }
 
+
+
 const UpdateTeams = async () => {
     try {
-        const response = await services.teamsUpdate(teams_Id.value,formCreate.value, auth);
-        console.log(response)
-        if (response.data.status === "Successful") {
-            Swal.fire({
-                position: "top-end",
-                icon: "success",
-                title: response.data.message,
-                showConfirmButton: false,
-                timer: 2000
-            });
-            router.push('/teams')
+        const modifiedFields = getModifiedFields(initialFormState.value, formCreate.value);
+        if (Object.keys(modifiedFields).length === 0) {
+            if (ImageForm.value.image === '') {
+                router.push('/teams')
+                return;
+            }
+            else {
+                let res = {
+                    "data": {
+                        "status": "Successful",
+                        "message": "Team member ryye55ff updated Successfully",
+                        "data": {
+                            "id": teams_Id.value
+                        }
+                    }
+                }
+                await InsertImage(res);
+            }
 
         }
-        
+
+        const response = await services.teamsUpdate(teams_Id.value, modifiedFields, auth);
+        if (response.data.status === "Successful") {
+            if (ImageForm.value.image !== '') {
+
+                await InsertImage(response);
+            }
+            else {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: response.data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                router.push('/teams')
+            }
+
+
+
+        }
+
     } catch (error) {
-        console.log(error)
+        Swal.fire({
+            text: error.response.data.message,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        })
     }
+}
+const InsertImage = async (response) => {
+    let dataImage = {
+        "image": ImageForm.value.image
+    }
+    const res_logo = await services.teamsAvatar(response.data.data.id, dataImage, auth);
+    if (res_logo.data.status === "Successful") {
+        Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: response.data.message,
+            showConfirmButton: false,
+            timer: 2000
+        });
+        router.push('/teams')
+    }
+}
+
+const getModifiedFields = (initial, current) => {
+    let modified = {};
+    for (let key in current) {
+        if (current[key] !== initial[key]) {
+            modified[key] = current[key];
+        }
+    }
+    return modified;
 }
 
 const resetForm = async () => {
