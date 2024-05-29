@@ -33,6 +33,13 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
       to: '/teams',
     }"
   />
+  <VerticalNavLink
+    :item="{
+      title: 'User',
+      icon: 'ri-user-fill',
+      to: '/users',
+    }"
+  />
   <!-- <VerticalNavLink
     :item="{
       title: 'Account Settings',

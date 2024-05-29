@@ -179,4 +179,41 @@ export default {
       return await axios.delete(api_url + `v1/teams/${team_id}`, auth)
     }
   },
+
+  // === users ===
+  async users(page_number, auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/users?page=${page_number}`, auth)
+    }
+  },
+  async usersRole(auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/users/create`, auth)
+    }
+  },
+  async userDetail(user_id, auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/users/${user_id}/edit`, auth)
+    }
+  },
+  async userSave(databody, auth) {
+    if (checkCookie()) {
+      return await axios.post(api_url + `v1/users`, databody, auth)
+    }
+  },
+  async userUpdate(user_id, databody, auth) {
+    if (checkCookie()) {
+      return await axios.patch(api_url + `v1/users/${user_id}`, databody, auth)
+    }
+  },
+  async userDelete(user_id, auth) {
+    if (checkCookie()) {
+      return await axios.delete(api_url + `v1/users/${user_id}`, auth)
+    }
+  },
+  async userAvatar(user_id, databody, auth) {
+    if (checkCookie()) {
+      return await axios.patch(api_url + `v1/users/${user_id}/avatar`, databody, auth)
+    }
+  },
 }

@@ -16,16 +16,19 @@ let auth = {
 const overlay = ref(false);
 const router = useRouter()
 const route = useRoute();
-const teams_Id = ref(route.params.id);
+const User_Id = ref(route.params.id);
 const refInputEl = ref()
 const formCreateRef = ref(null);
 const form = {
-    email: '',
     firstname: '',
     lastname: '',
-    note: '',
     username: '',
-    password: ''
+    email: '',
+    password: '',
+    note: '',
+    telephone: '',
+    address: '',
+    role_id: ''
 }
 const formCreate = ref(structuredClone(form));
 const initialFormState = ref(structuredClone(form));
@@ -34,44 +37,66 @@ const imageData = {
     "NotImage": Notlogo
 }
 const ImageForm = ref(structuredClone(imageData));
+const dataroles = ref([]);
+const isPasswordVisible = ref(false)
 onMounted(async () => {
-    if (teams_Id.value) {
-        await teamsDetail();
+    if(User_Id.value){
+        await userDetail();
     }
-});
+    else{
+        await usersRole();
+    }
+    
 
-const teamsDetail = async () => {
+});
+const usersRole = async () => {
     try {
         overlay.value = true
-        const response = await services.teamsDetail(teams_Id.value, auth);
+        const response = await services.usersRole(auth);
         overlay.value = false
         if (response.data.status === "Successful") {
-            ImageForm.value.NotImage = response.data.data.image
-            formCreate.value = response.data.data
-            initialFormState.value = structuredClone(response.data.data);
-
+            dataroles.value = response.data.data.roles
         }
+        
+
     } catch (error) {
+        overlay.value = false
         console.log(error)
     }
 }
 
-const addTeams = async () => {
+const userDetail =async ()=>{
+    try {
+        const response = await services.userDetail(User_Id.value,auth);
+        if (response.data.status === "Successful") {
+            formCreate.value= response.data.data.user
+            ImageForm.value.NotImage =response.data.data.user.image
+            dataroles.value = response.data.data.roles;
+            initialFormState.value = structuredClone(response.data.data.user);
+        }
+    } catch (error) {
+        Swal.fire({
+            text: error.response.data.message,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        })
+    }
+}
+
+const addUser = async () => {
     try {
 
         const { valid } = await formCreateRef.value.validate()
         if (valid) {
-
-            if (teams_Id.value) {
-                await UpdateTeams();
+            if(User_Id.value){
+              await  UpdateUser();
             }
-            else {
-                console.log("yes")
-                await InsertTeams()
+            else{
+                await InsertUser();
             }
-
-
         }
+
+
     } catch (error) {
 
         Swal.fire({
@@ -80,10 +105,13 @@ const addTeams = async () => {
             confirmButtonText: 'OK'
         })
     }
+
 }
-const InsertTeams = async () => {
+
+const InsertUser =async ()=>{
     try {
-        const response = await services.teamsSave(formCreate.value, auth);
+        const response = await services.userSave(formCreate.value, auth);
+       console.log(response)
         if (response.data.status === "Successful") {
             if (ImageForm.value.image !== "") {
                 await InsertImage(response);
@@ -96,11 +124,12 @@ const InsertTeams = async () => {
                     showConfirmButton: false,
                     timer: 2000
                 });
-                router.push('/teams')
+                router.push('/users')
             }
 
 
         }
+        
     } catch (error) {
         Swal.fire({
             text: error.response.data.message,
@@ -110,14 +139,13 @@ const InsertTeams = async () => {
     }
 }
 
-
-
-const UpdateTeams = async () => {
+const UpdateUser = async () => {
     try {
         const modifiedFields = getModifiedFields(initialFormState.value, formCreate.value);
-        if (Object.keys(modifiedFields).length === 0) {
+        modifiedFields.role_id = formCreate.value.role_id;
+        if (Object.keys(modifiedFields).length === 1 && modifiedFields.hasOwnProperty('role_id')) {
             if (ImageForm.value.image === '') {
-                router.push('/teams')
+                router.push('/users')
                 return;
             }
             else {
@@ -126,7 +154,7 @@ const UpdateTeams = async () => {
                         "status": "Successful",
                         "message": "Team member ryye55ff updated Successfully",
                         "data": {
-                            "id": teams_Id.value
+                            "id": User_Id.value
                         }
                     }
                 }
@@ -136,7 +164,7 @@ const UpdateTeams = async () => {
 
         }
 
-        const response = await services.teamsUpdate(teams_Id.value, modifiedFields, auth);
+        const response = await services.userUpdate(User_Id.value, modifiedFields, auth);
         if (response.data.status === "Successful") {
             if (ImageForm.value.image !== '') {
 
@@ -150,7 +178,7 @@ const UpdateTeams = async () => {
                     showConfirmButton: false,
                     timer: 2000
                 });
-                router.push('/teams')
+                router.push('/users')
             }
 
 
@@ -169,7 +197,7 @@ const InsertImage = async (response) => {
     let dataImage = {
         "image": ImageForm.value.image
     }
-    const res_logo = await services.teamsAvatar(response.data.data.id, dataImage, auth);
+    const res_logo = await services.userAvatar(response.data.data.id, dataImage, auth);
     if (res_logo.data.status === "Successful") {
         Swal.fire({
             position: "top-end",
@@ -178,7 +206,15 @@ const InsertImage = async (response) => {
             showConfirmButton: false,
             timer: 2000
         });
-        router.push('/teams')
+        router.push('/users')
+    }
+}
+
+const resetForm = async () => {
+    resetImage()
+    formCreate.value = structuredClone(form);
+    if (User_Id.value) {
+        await teamsDetail()
     }
 }
 
@@ -192,13 +228,6 @@ const getModifiedFields = (initial, current) => {
     return modified;
 }
 
-const resetForm = async () => {
-    resetImage()
-    formCreate.value = structuredClone(form);
-    if (teams_Id.value) {
-        await teamsDetail()
-    }
-}
 
 const changeLogo = file => {
     const fileReader = new FileReader();
@@ -254,8 +283,9 @@ const resetImage = () => {
             </v-progress-circular>
         </v-overlay>
     </div>
+
     <div>
-        <h1>{{ teams_Id === "" ? 'เพิ่ม Teams' : 'แก้ไข Teams' }}</h1>
+        <h1>{{ User_Id === "" ? 'เพิ่ม User' : 'แก้ไข User' }}</h1>
     </div>
     <VRow class="match-height align-center  justify-center mt-4">
         <VCol cols="12" md="10">
@@ -287,7 +317,7 @@ const resetImage = () => {
                         </div>
                     </VCardText>
                     <VCardText>
-                        <VRow class="justify-center align-center">
+                        <VRow  align="start">
                             <VCol cols="12" md="6">
                                 <VTextField v-model="formCreate.firstname" required label="ชื่อของ user"
                                     :rules="[v => !!v || 'โปรดกรอกชื่อของ user']" density="compact" />
@@ -295,36 +325,46 @@ const resetImage = () => {
                             <VCol cols="12" md="6">
                                 <VTextField v-model="formCreate.lastname" label="นามสกุลของ user" density="compact" />
                             </VCol>
-                            <VCol cols="12">
-                                <VTextField v-model="formCreate.note" label="บันทึกของ user">
-                                </VTextField>
+                            <VCol cols="12" md="6">
+                                <VTextField v-model="formCreate.telephone"  label="เบอร์โทรศัพท์ของ user"
+                                    density="compact" />
                             </VCol>
-
-                            <VCol cols="12">
-                                <VTextField v-model="formCreate.email" label="Email ของ user" density="compact" />
+                            <VCol cols="12" md="6">
+                                <VTextField v-model="formCreate.address" label="ที่อยู่ของ user" density="compact" />
                             </VCol>
                             <VCol cols="12">
+                                <VTextField v-model="formCreate.email" type="email" label="Email ของ user"
+                                    density="compact" />
+                            </VCol>
+                            <VCol cols="12">
+                                <VTextField v-model="formCreate.note" label="บันทึก ของ user" density="compact" />
+                            </VCol>
+                            <VCol cols="12" md="6" class="text-start">
                                 <VTextField v-model="formCreate.username" required label="Username ของ user"
                                     :rules="[v => !!v || 'โปรดกรอก Username ของ user']" density="compact" />
                             </VCol>
-                            <VCol cols="12" v-if="teams_Id == ''">
-                                <VTextField v-model="formCreate.password" required label="password ของ user"
-                                    :rules="[v => !!v || 'โปรดกรอก password ของ user']" density="compact" />
+                            <VCol cols="12" md="6" v-if="User_Id.value===''">
+                                <VTextField v-model="formCreate.password" placeholder="············"
+                                    :type="isPasswordVisible ? 'text' : 'password'"
+                                    :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
+                                    @click:append-inner="isPasswordVisible = !isPasswordVisible"
+                                    label="Password ของ user" :rules="[v => !!v || 'โปรดกรอก Password ของ user']"
+                                    density="compact" />
                             </VCol>
-
-
-
+                            <VCol cols="12">
+                                <VAutocomplete v-model="formCreate.role_id" autocomplete="no"
+                                    label="ระดับสิทธิ ของ user" :items="dataroles" item-title="name" density="compact"
+                                    item-value="id" required :rules="[v => !!v || 'โปรดเลือก ระดับสิทธิ ของ user']" />
+                            </VCol>
                         </VRow>
-
                     </VCardText>
-
                 </VForm>
             </VCard>
         </VCol>
     </VRow>
     <VRow>
         <VCol cols="12" class="mt-6 text-center">
-            <RouterLink :to="`/teams`" icon color="secondary" size="x-small" variant="text">
+            <RouterLink :to="`/users`" icon color="secondary" size="x-small" variant="text">
                 <VBtn variant="tonal" color="secondary" class="mx-4">
                     <VIcon class="me-1" icon="ri-arrow-left-line" size="22" />
                     กลับ
@@ -332,9 +372,9 @@ const resetImage = () => {
 
             </RouterLink>
 
-            <VBtn variant="tonal" class="mx-4" @click="addTeams()">
+            <VBtn variant="tonal" class="mx-4" @click="addUser()">
                 <VIcon size="24" icon="ri-add-line" />
-                บันทึก Teams
+                บันทึก User
             </VBtn>
 
             <VBtn variant="tonal" color="info" class="mx-4" @click="resetForm()">

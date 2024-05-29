@@ -63,6 +63,23 @@ export const routes = [
         },
       },
       {
+        path: 'users',
+        component: () => import('@/views/user/Data.vue'),
+        meta: {
+          title: 'users',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'users-create/:id?',
+        component: () => import('@/views/user/Create.vue'),
+        meta: {
+          title: 'users-create',
+          requiresAuth: true,
+        },
+      },
+
+      {
         path: 'test',
         component: () => import('@/views/test/Create.vue'),
         meta: {
