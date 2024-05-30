@@ -47,6 +47,14 @@ export const routes = [
         },
       },
       {
+        path: 'project-report/:id',
+        component: () => import('@/views/project/Report.vue'),
+        meta: {
+          title: 'project-create',
+          requiresAuth: true,
+        },
+      },
+      {
         path: 'teams',
         component: () => import('@/views/teams/Data.vue'),
         meta: {

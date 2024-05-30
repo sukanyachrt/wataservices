@@ -148,6 +148,21 @@ export default {
       return await axios.delete(api_url + `v1/projects/${project_id}`, auth)
     }
   },
+  async projectDashboard(auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/projects/dashboard`, auth)
+    }
+  },
+  async projectGenlink(project_id,auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/projects/${project_id}/genlink`, auth)
+    }
+  },
+  async projectLink(encrypted_url) {
+    if (checkCookie()) {
+      return `projects/customer/${encrypted_url}`
+    }
+  },
   // === teams ===
   async teams(page_number, auth) {
     if (checkCookie()) {
@@ -214,6 +229,13 @@ export default {
   async userAvatar(user_id, databody, auth) {
     if (checkCookie()) {
       return await axios.patch(api_url + `v1/users/${user_id}/avatar`, databody, auth)
+    }
+  },
+
+  // === report ===
+  async reportProject(project_id, auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/projects/${project_id}/reports`, auth)
     }
   },
 }
