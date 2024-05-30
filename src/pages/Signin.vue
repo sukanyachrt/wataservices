@@ -6,7 +6,7 @@ import Swal from 'sweetalert2'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const store = useAccountStore()
-import logo from '@images/logo.svg?raw'
+import logowata from '@images/logowata.png'
 import { ref } from 'vue';
 const form = {
   email: '',
@@ -103,12 +103,11 @@ const Signin = async () => {
       <VCardItem class="justify-center">
         <template #prepend>
           <div class="d-flex">
-            <div v-html="logo" />
+           <VAvatar rounded="lg" size="120" :image="logowata" class="mx-4"/>
           </div>
         </template>
 
-        <VCardTitle class="font-weight-semibold text-2xl text-uppercase"> ata Services </VCardTitle>
-      </VCardItem>
+       </VCardItem>
 
       <VCardText class="pt-2 text-center">
         <h5 class="text-h5 font-weight-semibold mb-1">Welcome to Wata Services! 👋🏻</h5>

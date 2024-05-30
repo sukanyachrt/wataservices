@@ -94,7 +94,7 @@ const downloadQrCode = async () => {
     width="500"
     v-model="dialogVisible"
   >
-    <VCard title="แชร์ลิงค์">
+    <VCard title="แชร์ลิงค์ให้กับลุกค้า">
       <VDivider class="mb-6" />
       <VCardText>
         {{ datadialog }}
