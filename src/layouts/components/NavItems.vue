@@ -41,7 +41,7 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
       to: '/users',
     }"
   />
-  <!-- <VerticalNavGroup
+  <VerticalNavGroup
     
     :item="{
       title: 'Project',
@@ -61,8 +61,8 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
         to: '/project?type=dashboard',
       }"
     />
-  </VerticalNavGroup> -->
-  <!-- <VerticalNavLink
+  </VerticalNavGroup> 
+ <VerticalNavLink
     :item="{
       title: 'Account Settings',
       icon: 'ri-user-settings-line',
@@ -138,6 +138,6 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
       icon: 'ri-table-alt-line',
       to: '/tables',
     }"
-  /> -->
+  />
 
 </template>

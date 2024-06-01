@@ -15,6 +15,7 @@ export default function (app) {
     },
     defaults,
     icons,
+    
     theme: {
       defaultTheme: 'light',
       themes,

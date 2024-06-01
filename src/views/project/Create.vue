@@ -10,7 +10,6 @@ import { useAccountStore } from '@/plugins/store';
 import { useRouter, useRoute } from 'vue-router';
 const store = useAccountStore();
 const newToken = store.decryptData(Cookies.get('wataservices_token'));
-console.log(newToken)
 let auth = {
     headers: {
         'Content-Type': 'application/json',
