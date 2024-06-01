@@ -1,6 +1,7 @@
 <script setup>
 import VerticalNavSectionTitle from '@/@layouts/components/VerticalNavSectionTitle.vue';
 import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
+import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
 </script>
 
 <template>
@@ -40,6 +41,27 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
       to: '/users',
     }"
   />
+  <!-- <VerticalNavGroup
+    
+    :item="{
+      title: 'Project',
+      icon: 'ri-list-check-3',
+      to: '/project',
+    }"
+  >
+    <VerticalNavLink
+      :item="{
+        title: 'Table',
+        to: '/project?type=table',
+      }"
+    />
+    <VerticalNavLink
+      :item="{
+        title: 'Dashboard',
+        to: '/project?type=dashboard',
+      }"
+    />
+  </VerticalNavGroup> -->
   <!-- <VerticalNavLink
     :item="{
       title: 'Account Settings',

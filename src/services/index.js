@@ -160,7 +160,7 @@ export default {
   },
   async projectLink(encrypted_url) {
     if (checkCookie()) {
-      return `projects/customer/${encrypted_url}`
+      return `${encrypted_url}`
     }
   },
   // === teams ===
@@ -238,4 +238,10 @@ export default {
       return await axios.get(api_url + `v1/projects/${project_id}/reports`, auth)
     }
   },
+  async reportDelete(report_id, auth) {
+    if (checkCookie()) {
+      return await axios.delete(api_url + `v1/reports/${report_id}`, auth)
+    }
+  },
+  
 }

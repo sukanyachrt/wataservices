@@ -1,10 +1,8 @@
 export const routes = [
   { path: '/', redirect: '/platforms', requiresAuth: true },
-
   {
     path: '/',
     component: () => import('@/layouts/default.vue'),
-    requiresAuth: true,
     children: [
       {
         path: 'platforms',
@@ -129,7 +127,10 @@ export const routes = [
     path: '/',
     component: () => import('@/layouts/blank.vue'),
     children: [
-
+      {
+        path: ':id',
+        component: () => import('@/views/customer/Data.vue'),
+      },
       {
         path: 'login',
         component: () => import('@/pages/login.vue'),
