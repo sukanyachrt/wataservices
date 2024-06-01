@@ -3,14 +3,9 @@ import Swal from 'sweetalert2'
 import Cookies from 'js-cookie'
 import services from '@/services'
 import myDialog from '@/components/Dialog.vue'
+import { formatDate_notime } from '@/plugins/function.js'
 import { useAccountStore } from '@/plugins/store';
 import { useRouter, useRoute } from 'vue-router';
-
-import '@/styles/flatpickr.scss'
-import flatPickr from 'vue-flatpickr-component'
-
-
-
 
 const store = useAccountStore();
 const newToken = store.decryptData(Cookies.get('wataservices_token'));
@@ -18,7 +13,8 @@ const newToken = store.decryptData(Cookies.get('wataservices_token'));
 let auth = {
     headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + newToken
+        'Authorization': 'Bearer ' + newToken,
+        'Accept': 'application/json'
     },
 }
 const router = useRouter()
@@ -111,14 +107,28 @@ const deleteReport = async (item, id) => {
     }
 }
 const AddReports = (columns, reports) => {
+    // ตรวจสอบว่ามีรายงานใดๆ ที่มี id เป็น null หรือไม่
+    const hasNullId = reports.some(item => item.id === null);
+
+    // ถ้าพบ id เป็น null ให้แสดงแจ้งเตือนและหยุดทำงาน
+    if (hasNullId) {
+        Swal.fire({
+            text: "โปรดบันทึกข้อมูลที่คุณสร้างมาก่อนหน้านี้ค่ะ",
+            icon: 'error',
+            confirmButtonText: 'OK'
+        })
+        return;
+    }
+
+    // สร้างรายงานใหม่เฉพาะเมื่อไม่พบ id เป็น null
     const newReport = { id: null };
     columns.forEach(column => {
         const refName = column.ref_name;
         newReport[refName] = null;
     });
     reports.push(newReport);
-    console.log(reports)
 }
+
 
 const deleteReportNotId = (report, index) => {
     console.log(report)
@@ -126,42 +136,57 @@ const deleteReportNotId = (report, index) => {
     report.splice(index, 1);
     console.log(report)
 }
-const datePickers = ref()
-const chooseCalendar_startdate = (index) => {
-    // Check if datePickers array is defined and has elements
-    if (datePickers && datePickers.length > 0) {
-        // Check if index is within bounds
-        if (index >= 0 && index < datePickers.length) {
-            const flatPickrInstance = datePickers[index];
-            // Verify if flatPickrInstance is defined
-            if (flatPickrInstance) {
-                const positionElement = document.getElementById('starting_date' + index);
-                // Verify if positionElement is defined
-                if (positionElement) {
-                    flatPickrInstance._positionElement = positionElement;
-                    flatPickrInstance.open();
-                } else {
-                    console.error('Position element not found for index:', index);
-                }
-            } else {
-                console.error('Flatpickr instance not found for index:', index);
-            }
-        } else {
-            console.error('Index out of bounds:', index);
-        }
-    } else {
-        console.error('datePickers array is undefined or empty');
-    }
-};
 
 onMounted(async () => {
 
 })
-const date = ref(null)
+const popupDate = ref([]);
 
+const showDatePicker = (index) => {
+    popupDate.value[index] = true
+};
+const formattedDate = ((item) => {
+    if (item) {
+        const date = new Date(item);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // ใช้ padStart เพื่อเติม 0 หน้าตัวเลขที่มีความยาวน้อยกว่า 2 ตัว
+        const day = date.getDate().toString().padStart(2, '0'); // ใช้ padStart เพื่อเติม 0 หน้าตัวเลขที่มีความยาวน้อยกว่า 2 ตัว
+
+        return `${day}/${month}/${year}`;
+    }
+    return null;
+});
+const formattedDateTosave = ((item) => {
+    if (item) {
+        const date = new Date(item);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // ใช้ padStart เพื่อเติม 0 หน้าตัวเลขที่มีความยาวน้อยกว่า 2 ตัว
+        const day = date.getDate().toString().padStart(2, '0'); // ใช้ padStart เพื่อเติม 0 หน้าตัวเลขที่มีความยาวน้อยกว่า 2 ตัว
+
+        return `${year}-${month}-${day}`;
+    }
+    return null;
+});
+const saveReport = async (services_id,item, index) => {
+    console.log(services_id,item, index)
+    const newItem ={...item}
+    if (newItem.posting_date) {
+        newItem.posting_date = formattedDateTosave(newItem.posting_date)
+    }
+    try {
+      const response = await services.reportSave(services_id,newItem,auth);
+      if (response.data.status === "Successful") {
+       await reportProject()
+      }
+
+    } catch (error) {
+        console.log(error)
+    }
+    console.log(newItem)
+}
 </script>
 <template>
-   <div class="text-center">
+    <div class="text-center">
         <v-overlay v-model="overlay" persistent class="align-center justify-center">
             <v-progress-circular :size="90" :width="6" color="primary" indeterminate>
                 <template v-slot:default>
@@ -173,15 +198,15 @@ const date = ref(null)
     <div>
         <h1>{{ Project_Id === "" ? 'เพิ่ม Project' : 'รายงาน Project' }}</h1>
 
-       
+
     </div>
-    
+
     <VRow class="match-height align-center  justify-center mt-4">
         <VCol cols="12">
             <VCard class="my-8" v-for="(item, optionIndex) in dataProject.services" :key="optionIndex">
                 <VCardTitle>
                     <VRow>
-                       
+
                         <VCol cols="12" md="6">
                             <span> {{ item.name }}</span>
 
@@ -234,6 +259,12 @@ const date = ref(null)
                                         <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
                                             class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
                                     </template>
+                                    <template v-else-if="itemC.ref_name === 'posting_date'">
+                                        {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                    </template>
+                                    <template v-else-if="itemC.ref_name === 'url'">
+                                        <a :href="itemReport[itemC.ref_name]">ลิงค์</a>
+                                    </template>
 
                                     <template v-else>
 
@@ -280,7 +311,21 @@ const date = ref(null)
                                     </template>
 
                                     <template v-else-if="itemC.ref_name === 'posting_date'">
+                                        <v-text-field color="primary" :value="formattedDate(itemReport[itemC.ref_name])"
+                                            @focus="showDatePicker(indexReport)" clearable
+                                            v-model="itemReport[itemC.ref_name]" placeholder="dd/mm/yyyy" Readonly
+                                            autocomplete="no" density="compact">
+                                            <template #prepend-inner>
 
+                                                <v-menu activator="parent" v-model="popupDate[indexReport]"
+                                                    :close-on-content-click="false">
+                                                    <v-date-picker color="primary" hideHeader hideWeekdays
+                                                        v-model="itemReport[itemC.ref_name]">
+                                                    </v-date-picker>
+                                                </v-menu>
+
+                                            </template>
+                                        </v-text-field>
                                     </template>
 
                                     <template v-else>
@@ -295,15 +340,16 @@ const date = ref(null)
                                 </td>
                                 <td v-if="itemReport.id === null" class="text-end">
 
-                                    <VBtn icon color="warning" size="x-small" variant="text">
-                                        <VIcon class="me-1" icon="ri-edit-box-line" size="22" />
+                                    <VBtn @click="saveReport(item.id,itemReport, indexReport)" icon color="info" size="x-small"
+                                        variant="text">
+                                        <VIcon class="me-1" icon="ri-save-line" size="26" />
                                         <VTooltip activator="parent" location="top">
-                                            แก้ไข Report
+                                            บันทึก Report
                                         </VTooltip>
                                     </VBtn>
                                     <VBtn @click="deleteReportNotId(item.reports, indexReport)" icon size="x-small"
                                         color="error" variant="text">
-                                        <VIcon class="me-1" icon="ri-delete-bin-6-line" size="22" />
+                                        <VIcon class="me-1" icon="ri-close-fill" size="26" />
                                         <VTooltip activator="parent" location="top">
                                             ลบ Report
                                         </VTooltip>

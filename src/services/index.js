@@ -238,6 +238,12 @@ export default {
       return await axios.get(api_url + `v1/projects/${project_id}/reports`, auth)
     }
   },
+  async reportSave(project_services_id,databody, auth) {
+    if (checkCookie()) {
+      return await axios.post(api_url + `v1/project-services/${project_services_id}/reports`, databody, auth)
+    }
+  },
+  
   async reportDelete(report_id, auth) {
     if (checkCookie()) {
       return await axios.delete(api_url + `v1/reports/${report_id}`, auth)

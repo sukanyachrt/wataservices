@@ -41,7 +41,7 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
       to: '/users',
     }"
   />
-  <VerticalNavGroup
+  <!-- <VerticalNavGroup
     
     :item="{
       title: 'Project',
@@ -138,6 +138,6 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
       icon: 'ri-table-alt-line',
       to: '/tables',
     }"
-  />
+  /> -->
 
 </template>
