@@ -20,13 +20,13 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
       to: '/services',
     }"
   />
-  <VerticalNavLink
+  <!-- <VerticalNavLink
     :item="{
       title: 'Project',
       icon: 'ri-list-check-3',
       to: '/project',
     }"
-  />
+  /> -->
   <VerticalNavLink
     :item="{
       title: 'Team ',
@@ -41,7 +41,7 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
       to: '/users',
     }"
   />
-  <!-- <VerticalNavGroup
+  <VerticalNavGroup
     
     :item="{
       title: 'Project',
@@ -51,18 +51,18 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
   >
     <VerticalNavLink
       :item="{
-        title: 'Table',
-        to: '/project?type=table',
+        title: 'Dashboard',
+        to: '/project-dashboard',
       }"
     />
     <VerticalNavLink
       :item="{
-        title: 'Dashboard',
-        to: '/project?type=dashboard',
+        title: 'Table',
+        to: '/project-table',
       }"
     />
   </VerticalNavGroup> 
- <VerticalNavLink
+  <!--<VerticalNavLink
     :item="{
       title: 'Account Settings',
       icon: 'ri-user-settings-line',

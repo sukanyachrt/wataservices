@@ -29,10 +29,18 @@ export const routes = [
         },
       },
       {
-        path: 'project',
-        component: () => import('@/views/project/Data.vue'),
+        path: 'project-dashboard',
+        component: () => import('@/views/project/Dashboard.vue'),
         meta: {
-          title: 'project',
+          title: 'project-dashboard',
+          requiresAuth: true,
+        },
+      },
+      {
+        path: 'project-table',
+        component: () => import('@/views/project/Table.vue'),
+        meta: {
+          title: 'project-table',
           requiresAuth: true,
         },
       },

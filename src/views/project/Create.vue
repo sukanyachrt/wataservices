@@ -283,7 +283,7 @@ const UpdateProject = async () => {
                 showConfirmButton: false,
                 timer: 2000
             });
-            router.push('/project')
+            router.push('/project-dashboard')
         }
 
     }
@@ -334,7 +334,7 @@ const InsertLogo = async (response) => {
             showConfirmButton: false,
             timer: 2000
         });
-        router.push('/project')
+        router.push('/project-dashboard')
     }
 }
 
@@ -598,7 +598,7 @@ const saveNewItem = async () => {
     </VRow>
     <VRow>
         <VCol cols="12" class="mt-6 text-center">
-            <RouterLink :to="`/project`" icon color="secondary" size="x-small" variant="text">
+            <RouterLink :to="`/project-dashboard`" icon color="secondary" size="x-small" variant="text">
                 <VBtn variant="tonal" color="secondary" class="mx-4">
                     <VIcon class="me-1" icon="ri-arrow-left-line" size="22" />
                     กลับ

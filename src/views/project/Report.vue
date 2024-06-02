@@ -300,7 +300,7 @@ const removeImage = item => {
         </v-overlay>
     </div>
     <div>
-        <h1>{{ Project_Id === "" ? 'เพิ่ม Project' : 'รายงาน Project' }}</h1>
+        <h1>{{ dataProject.name }}</h1>
     </div>
     <VCardText>
         <input ref="refInputEl" type="file" name="file" accept=".jpeg,.png,.jpg,GIF" hidden
