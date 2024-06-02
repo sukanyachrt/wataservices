@@ -243,6 +243,11 @@ export default {
       return await axios.post(api_url + `v1/project-services/${project_services_id}/reports`, databody, auth)
     }
   },
+  async reportUpdate(report_id, databody, auth) {
+    if (checkCookie()) {
+      return await axios.patch(api_url + `v1/reports/${report_id}`, databody, auth)
+    }
+  },
   
   async reportDelete(report_id, auth) {
     if (checkCookie()) {

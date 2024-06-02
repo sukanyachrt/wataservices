@@ -24,6 +24,8 @@ const overlay = ref(false);
 const myConfirmDelRef = ref(null)
 const dataProject = ref([]);
 const dataResponders = ref([])
+const editingReportIndex = ref(null);  // Added for tracking the edit state
+
 onMounted(async () => {
     if (Project_Id.value) {
         await reportProject();
@@ -39,7 +41,6 @@ const reportProject = async () => {
         if (response.data.status === "Successful") {
             dataProject.value = response.data.data.project;
             dataResponders.value = response.data.data.responders;
-
         }
     } catch (error) {
         overlay.value = false
@@ -65,12 +66,10 @@ const convertrtetretre = (item) => {
     let foundResponders = dataResponders.value.find(responders => responders.id === item);
     if (foundResponders) {
         return ` <VAvatar  rounded="lg" size="60" class="me-6 my-2" image="${foundResponders.image}" />`;
-
     } else {
         return "";
     }
 }
-
 
 const deleteReport = async (item, id) => {
     if (myConfirmDelRef.value) {
@@ -85,11 +84,9 @@ const deleteReport = async (item, id) => {
             try {
                 const result = await services.reportDelete(id, auth)
                 if (result.data.status === "Successful") {
-
                     const index = item.reports.findIndex(item => item.id === id);
                     if (index !== -1) {
                         item.reports.splice(index, 1);
-
                     }
                 }
                 else {
@@ -99,7 +96,6 @@ const deleteReport = async (item, id) => {
                         confirmButtonText: 'OK'
                     })
                 }
-
             } catch (error) {
                 console.log(error)
             }
@@ -107,10 +103,9 @@ const deleteReport = async (item, id) => {
     }
 }
 const AddReports = (columns, reports) => {
-    // ตรวจสอบว่ามีรายงานใดๆ ที่มี id เป็น null หรือไม่
+    editingReportIndex.value = null
     const hasNullId = reports.some(item => item.id === null);
 
-    // ถ้าพบ id เป็น null ให้แสดงแจ้งเตือนและหยุดทำงาน
     if (hasNullId) {
         Swal.fire({
             text: "โปรดบันทึกข้อมูลที่คุณสร้างมาก่อนหน้านี้ค่ะ",
@@ -120,7 +115,6 @@ const AddReports = (columns, reports) => {
         return;
     }
 
-    // สร้างรายงานใหม่เฉพาะเมื่อไม่พบ id เป็น null
     const newReport = { id: null };
     columns.forEach(column => {
         const refName = column.ref_name;
@@ -129,62 +123,108 @@ const AddReports = (columns, reports) => {
     reports.push(newReport);
 }
 
-
 const deleteReportNotId = (report, index) => {
-    console.log(report)
-    console.log(index)
     report.splice(index, 1);
-    console.log(report)
 }
 
-onMounted(async () => {
-
-})
 const popupDate = ref([]);
+const popupDateDraf = ref([]);
+const showDatePickerDraf = (index, item, type) => {
+    if (item) {
+        if (type === 'draft_date') {
+            item.draft_date = null
+        }
 
-const showDatePicker = (index) => {
+
+    }
+
+    popupDateDraf.value[index] = true
+}
+
+const showDatePicker = (index, item, type) => {
+    if (item) {
+        if (type === 'draft_date') {
+            item.draft_date = null
+        }
+        else if (type === 'posting_date') {
+            item.posting_date = null
+        }
+
+    }
+
     popupDate.value[index] = true
+
+
+
+
+
 };
+
 const formattedDate = ((item) => {
     if (item) {
+
         const date = new Date(item);
         const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // ใช้ padStart เพื่อเติม 0 หน้าตัวเลขที่มีความยาวน้อยกว่า 2 ตัว
-        const day = date.getDate().toString().padStart(2, '0'); // ใช้ padStart เพื่อเติม 0 หน้าตัวเลขที่มีความยาวน้อยกว่า 2 ตัว
-
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
         return `${day}/${month}/${year}`;
     }
     return null;
 });
+
 const formattedDateTosave = ((item) => {
     if (item) {
         const date = new Date(item);
         const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0'); // ใช้ padStart เพื่อเติม 0 หน้าตัวเลขที่มีความยาวน้อยกว่า 2 ตัว
-        const day = date.getDate().toString().padStart(2, '0'); // ใช้ padStart เพื่อเติม 0 หน้าตัวเลขที่มีความยาวน้อยกว่า 2 ตัว
-
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
     return null;
 });
-const saveReport = async (services_id,item, index) => {
-    console.log(services_id,item, index)
-    const newItem ={...item}
+
+const saveReport = async (services_id, item, index) => {
+    const newItem = { ...item }
     if (newItem.posting_date) {
         newItem.posting_date = formattedDateTosave(newItem.posting_date)
     }
+    if (newItem.draft_date) {
+        newItem.draft_date = formattedDateTosave(newItem.draft_date)
+    }
     try {
-      const response = await services.reportSave(services_id,newItem,auth);
-      if (response.data.status === "Successful") {
-       await reportProject()
-      }
+        console.log(item)
+        if (newItem.id) {
+            console.log("มีค่า")
+            const response = await services.reportUpdate(newItem.id, newItem, auth);
+            if (response.data.status === "Successful") {
+                await reportProject();
+                editingReportIndex.value = null;  // Reset edit state after saving
+            }
+        }
+        else {
+            console.log(services_id)
+            const response = await services.reportSave(services_id, newItem, auth);
+            console.log(response)
+            if (response.data.status === "Successful") {
+                await reportProject();
+
+            }
+        }
 
     } catch (error) {
         console.log(error)
     }
-    console.log(newItem)
+}
+
+const editReport = async (index) => {
+    if (editingReportIndex.value) {
+        await reportProject();
+    }
+
+    editingReportIndex.value = index;
 }
 </script>
+
 <template>
     <div class="text-center">
         <v-overlay v-model="overlay" persistent class="align-center justify-center">
@@ -197,19 +237,15 @@ const saveReport = async (services_id,item, index) => {
     </div>
     <div>
         <h1>{{ Project_Id === "" ? 'เพิ่ม Project' : 'รายงาน Project' }}</h1>
-
-
     </div>
 
-    <VRow class="match-height align-center  justify-center mt-4">
+    <VRow class="match-height align-center justify-center mt-4">
         <VCol cols="12">
             <VCard class="my-8" v-for="(item, optionIndex) in dataProject.services" :key="optionIndex">
                 <VCardTitle>
                     <VRow>
-
                         <VCol cols="12" md="6">
                             <span> {{ item.name }}</span>
-
                         </VCol>
                         <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
                             เครดิต : <VBtn class="ms-2" color="success" variant="outlined">
@@ -217,7 +253,6 @@ const saveReport = async (services_id,item, index) => {
                             </VBtn>
                         </VCol>
                     </VRow>
-
                 </VCardTitle>
                 <VCardText class="d-flex mt-2">
                     <VTable style="width: 100% !important;">
@@ -228,9 +263,9 @@ const saveReport = async (services_id,item, index) => {
                                     {{ itemCol.name }}
                                 </th>
                                 <th>
-                                    Render Note
+                                    บันทึกภายใน
                                 </th>
-                                <th style="background-color: #fff !important; " class="text-end">
+                                <th style="background-color: #fff !important;" class="text-end">
                                     <VBtn @click="AddReports(item.columns, item.reports)" rounded="lg" color="primary"
                                         size="small">
                                         <VIcon start icon="ri-add-circle-fill" />
@@ -238,48 +273,130 @@ const saveReport = async (services_id,item, index) => {
                                     </VBtn>
                                 </th>
                             </tr>
+
                         </thead>
                         <tbody>
                             <tr v-for="(itemReport, indexReport) in item.reports" :key="indexReport">
                                 <td v-if="itemReport.id > 0" class="text-uppercase text-center"
                                     v-for="(itemC, indexC) in item.columns" :key="indexC">
+                                    <template v-if="editingReportIndex !== indexReport">
+                                        <template v-if="itemC.ref_name === 'status_id'">
+                                            <div v-html="convertStatus(itemReport[itemC.ref_name], item.statuses)">
+                                            </div>
+                                        </template>
+                                        <template v-else-if="itemC.ref_name === 'responder_id'">
+                                            <div v-html="convertrtetretre(itemReport[itemC.ref_name])"></div>
+                                        </template>
+                                        <template v-else-if="itemC.ref_name === 'image'">
+                                            <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
+                                                class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
+                                        </template>
+                                        <template v-else-if="itemC.ref_name === 'draft_date'">
+                                            <span v-if="itemReport[itemC.ref_name]">
+                                                {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                            </span>
 
-                                    <template v-if="itemC.ref_name === 'status_id'">
-                                        <div v-html="convertStatus(itemReport[itemC.ref_name], item.statuses)">
 
-                                        </div>
-                                    </template>
+                                        </template>
+                                        <template v-else-if="itemC.ref_name === 'posting_date'">
+                                            <span v-if="itemReport[itemC.ref_name]">
+                                                {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                            </span>
+                                        </template>
+                                        <template v-else-if="itemC.ref_name === 'url'">
+                                            <template v-if="itemReport[itemC.ref_name]">
+                                                <a :href="itemReport[itemC.ref_name]" target="_blank">ลิงค์</a>
+                                            </template>
 
-                                    <template v-else-if="itemC.ref_name === 'responder_id'">
-                                        <div v-html="convertrtetretre(itemReport[itemC.ref_name])">
-                                        </div>
-                                    </template>
+                                        </template>
 
-                                    <template v-else-if="itemC.ref_name === 'image'">
-                                        <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
-                                            class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
+                                        <template v-else>
+                                            {{ itemReport[itemC.ref_name] }}
+                                        </template>
                                     </template>
-                                    <template v-else-if="itemC.ref_name === 'posting_date'">
-                                        {{ formatDate_notime(itemReport[itemC.ref_name]) }}
-                                    </template>
-                                    <template v-else-if="itemC.ref_name === 'url'">
-                                        <a :href="itemReport[itemC.ref_name]">ลิงค์</a>
-                                    </template>
-
                                     <template v-else>
+                                        <!-- Editable Fields -->
+                                        <template v-if="itemC.ref_name === 'status_id'">
+                                            <VAutocomplete v-model="itemReport[itemC.ref_name]" autocomplete="no"
+                                                :items="item.statuses" item-title="name" item-value="id"
+                                                density="compact" clearable :placeholder="itemC.name"
+                                                :label="itemC.name" />
+                                        </template>
+                                        <template v-else-if="itemC.ref_name === 'responder_id'">
+                                            <div v-html="convertrtetretre(itemReport[itemC.ref_name])"></div>
+                                        </template>
+                                        <template v-else-if="itemC.ref_name === 'image'">
+                                            <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
+                                                class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
+                                        </template>
+                                        <template v-else-if="itemC.ref_name === 'draft_date'">
+                                            <v-text-field color="primary"
+                                                :value="formattedDate(itemReport[itemC.ref_name])"
+                                                @focus="showDatePickerDraf(indexReport, itemReport, 'draft_date')"
+                                                clearable v-model="itemReport[itemC.ref_name]" Readonly
+                                                autocomplete="no" density="compact">
+                                                <template #prepend-inner>
+                                                    <v-menu activator="parent" v-model="popupDateDraf[indexReport]"
+                                                        :close-on-content-click="false">
+                                                        <v-date-picker color="primary" hideHeader hideWeekdays
+                                                            v-model="itemReport[itemC.ref_name]">
+                                                        </v-date-picker>
+                                                    </v-menu>
+                                                </template>
+                                            </v-text-field>
+                                        </template>
+                                        <template v-else-if="itemC.ref_name === 'posting_date'">
+                                            <v-text-field color="primary"
+                                                :value="formattedDate(itemReport[itemC.ref_name])"
+                                                @focus="showDatePicker(indexReport, itemReport, 'posting_date')"
+                                                clearable v-model="itemReport[itemC.ref_name]" Readonly
+                                                autocomplete="no" density="compact">
+                                                <template #prepend-inner>
+                                                    <v-menu activator="parent" v-model="popupDate[indexReport]"
+                                                        :close-on-content-click="false">
+                                                        <v-date-picker color="primary" hideHeader hideWeekdays
+                                                            v-model="itemReport[itemC.ref_name]">
+                                                        </v-date-picker>
+                                                    </v-menu>
+                                                </template>
+                                            </v-text-field>
+                                        </template>
 
-                                        {{ itemReport[itemC.ref_name] }}
+                                        <template v-else>
+                                            <VTextField v-model="itemReport[itemC.ref_name]" :placeholder="itemC.name"
+                                                variant="outlined" autocomplete="no" density="compact">
+                                            </VTextField>
+                                        </template>
                                     </template>
                                 </td>
-                                <td v-if="itemReport.id > 0">
-                                    -
+                                <td
+                                    v-if="itemReport.id > 0 && (itemReport.inner_note === null || itemReport.inner_note)">
+
+                                    <template v-if="editingReportIndex !== indexReport">
+                                        {{ itemReport.inner_note }}
+                                    </template>
+                                    <template v-else>
+                                        <template v-if="itemReport.inner_note === null || itemReport.inner_note">
+                                            <VTextField v-model="itemReport.inner_note" placeholder="บันทึกภายใน"
+                                                variant="outlined" autocomplete="no" density="compact">
+                                            </VTextField>
+                                        </template>
+                                    </template>
                                 </td>
                                 <td v-if="itemReport.id > 0" class="text-end">
-
-                                    <VBtn icon color="warning" size="x-small" variant="text">
+                                    <VBtn v-if="editingReportIndex !== indexReport" @click="editReport(indexReport)"
+                                        icon color="warning" size="x-small" variant="text">
                                         <VIcon class="me-1" icon="ri-edit-box-line" size="22" />
                                         <VTooltip activator="parent" location="top">
                                             แก้ไข Report
+                                        </VTooltip>
+                                    </VBtn>
+                                    <VBtn v-if="editingReportIndex === indexReport"
+                                        @click="saveReport(item.id, itemReport, indexReport)" icon color="info"
+                                        size="x-small" variant="text">
+                                        <VIcon class="me-1" icon="ri-save-line" size="26" />
+                                        <VTooltip activator="parent" location="top">
+                                            บันทึก Report
                                         </VTooltip>
                                     </VBtn>
                                     <VBtn @click="deleteReport(item, itemReport.id)" icon size="x-small" color="error"
@@ -299,49 +416,57 @@ const saveReport = async (services_id,item, index) => {
                                             :items="item.statuses" item-title="name" item-value="id" density="compact"
                                             clearable :placeholder="itemC.name" :label="itemC.name" />
                                     </template>
-
                                     <template v-else-if="itemC.ref_name === 'responder_id'">
-                                        <div v-html="convertrtetretre(itemReport[itemC.ref_name])">
-                                        </div>
+                                        <div v-html="convertrtetretre(itemReport[itemC.ref_name])"></div>
                                     </template>
-
                                     <template v-else-if="itemC.ref_name === 'image'">
                                         <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
                                             class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
                                     </template>
-
+                                    <template v-else-if="itemC.ref_name === 'draft_date'">
+                                        <v-text-field color="primary" :value="formattedDate(itemReport[itemC.ref_name])"
+                                            @focus="showDatePickerDraf(indexReport)" clearable
+                                            v-model="itemReport[itemC.ref_name]" placeholder="dd/mm/yyyy" Readonly
+                                            autocomplete="no" density="compact">
+                                            <template #prepend-inner>
+                                                <v-menu activator="parent" v-model="popupDateDraf[indexReport]"
+                                                    :close-on-content-click="false">
+                                                    <v-date-picker color="primary" hideHeader hideWeekdays
+                                                        v-model="itemReport[itemC.ref_name]">
+                                                    </v-date-picker>
+                                                </v-menu>
+                                            </template>
+                                        </v-text-field>
+                                    </template>
                                     <template v-else-if="itemC.ref_name === 'posting_date'">
                                         <v-text-field color="primary" :value="formattedDate(itemReport[itemC.ref_name])"
                                             @focus="showDatePicker(indexReport)" clearable
                                             v-model="itemReport[itemC.ref_name]" placeholder="dd/mm/yyyy" Readonly
                                             autocomplete="no" density="compact">
                                             <template #prepend-inner>
-
                                                 <v-menu activator="parent" v-model="popupDate[indexReport]"
                                                     :close-on-content-click="false">
                                                     <v-date-picker color="primary" hideHeader hideWeekdays
                                                         v-model="itemReport[itemC.ref_name]">
                                                     </v-date-picker>
                                                 </v-menu>
-
                                             </template>
                                         </v-text-field>
                                     </template>
-
                                     <template v-else>
                                         <VTextField v-model="itemReport[itemC.ref_name]" :placeholder="itemC.name"
                                             variant="outlined" autocomplete="no" density="compact">
                                         </VTextField>
-
                                     </template>
                                 </td>
                                 <td v-if="itemReport.id === null">
-                                    -
+                                    <VTextField v-model="itemReport.inner_note" placeholder="บันทึกภายใน"
+                                        variant="outlined" autocomplete="no" density="compact">
+                                    </VTextField>
                                 </td>
                                 <td v-if="itemReport.id === null" class="text-end">
-
-                                    <VBtn @click="saveReport(item.id,itemReport, indexReport)" icon color="info" size="x-small"
-                                        variant="text">
+                                    <VBtn @click="saveReport(item.project_service_id, itemReport, indexReport)" icon
+                                        color="info" size="x-small" variant="text">
                                         <VIcon class="me-1" icon="ri-save-line" size="26" />
                                         <VTooltip activator="parent" location="top">
                                             บันทึก Report
@@ -363,5 +488,4 @@ const saveReport = async (services_id,item, index) => {
         </VCol>
     </VRow>
     <myDialog ref="myConfirmDelRef" />
-
 </template>
