@@ -9,8 +9,14 @@
 
     // 👉 Vertical nav group
     .nav-group {
+     
       .nav-group-arrow {
         font-size: 1.375rem;
+      }
+      .nav-group-label{
+        font-size: medium;
+        padding-top: 22px !important;
+        padding-bottom: 22px !important;
       }
     }
 
