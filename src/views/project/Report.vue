@@ -192,9 +192,7 @@ const saveReport = async (services_id, item, index) => {
         newItem.draft_date = formattedDateTosave(newItem.draft_date)
     }
     try {
-        console.log(item)
         if (newItem.id) {
-            console.log("มีค่า")
             const response = await services.reportUpdate(newItem.id, newItem, auth);
             if (response.data.status === "Successful") {
                 await reportProject();
@@ -202,9 +200,7 @@ const saveReport = async (services_id, item, index) => {
             }
         }
         else {
-            console.log(services_id)
             const response = await services.reportSave(services_id, newItem, auth);
-            console.log(response)
             if (response.data.status === "Successful") {
                 await reportProject();
 
@@ -212,7 +208,11 @@ const saveReport = async (services_id, item, index) => {
         }
 
     } catch (error) {
-        console.log(error)
+        Swal.fire({
+            text: `${error.response.data.message}`,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        })
     }
 }
 
@@ -399,11 +399,18 @@ const editReport = async (index) => {
                                             บันทึก Report
                                         </VTooltip>
                                     </VBtn>
-                                    <VBtn @click="deleteReport(item, itemReport.id)" icon size="x-small" color="error"
+                                    <VBtn v-if="editingReportIndex !== indexReport" @click="deleteReport(item, itemReport.id)" icon size="x-small" color="error"
                                         variant="text">
                                         <VIcon class="me-1" icon="ri-delete-bin-6-line" size="22" />
                                         <VTooltip activator="parent" location="top">
                                             ลบ Report
+                                        </VTooltip>
+                                    </VBtn>
+                                    <VBtn  v-if="editingReportIndex === indexReport" @click="editingReportIndex = null" icon size="x-small" color="default"
+                                        variant="text">
+                                        <VIcon class="me-1" icon="ri-close-fill" size="22" />
+                                        <VTooltip activator="parent" location="top">
+                                            ยกเลิกแก้ไข Report
                                         </VTooltip>
                                     </VBtn>
                                 </td>
