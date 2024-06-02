@@ -13,7 +13,7 @@ const form = {
   password: '',
   remember: false,
 }
-const overlay = ref(false)
+const overlay = ref(true)
 const formRef = ref(null)
 const formSignin = ref(structuredClone(form))
 const isPasswordVisible = ref(false)
@@ -21,6 +21,9 @@ onMounted(async () => {
   const loggedIn =await Cookies.get('wataservices_token')
   if (loggedIn) {
     router.push("/platforms");
+  }
+  else{
+    overlay.value=false
   }
 })
 
@@ -98,7 +101,7 @@ const Signin = async () => {
       </v-progress-circular>
     </v-overlay>
   </div>
-  <div class="auth-wrapper d-flex align-center justify-center pa-4">
+  <div v-if="overlay===false" class="auth-wrapper d-flex align-center justify-center pa-4">
     <VCard class="auth-card pa-4 pt-7" max-width="448">
       <VCardItem class="justify-center">
         <template #prepend>

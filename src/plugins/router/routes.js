@@ -1,5 +1,36 @@
 export const routes = [
-  { path: '/', redirect: '/platforms', requiresAuth: true },
+  { path: '/:id', component: () => import('@/views/customer/Data.vue') },
+  { path: '/', redirect: '/signin' },
+  {
+    path: '/',
+    component: () => import('@/layouts/blank.vue'),
+    children: [
+      {
+        path: ':id',
+        component: () => import('@/views/customer/Data.vue'),
+      },
+      {
+        path: 'login',
+        component: () => import('@/pages/login.vue'),
+      },
+      {
+        path: 'signin',
+        component: () => import('@/pages/Signin.vue'),
+      },
+      {
+        path: 'logout',
+        component: () => import('@/pages/Logout.vue'),
+      },
+      {
+        path: 'register',
+        component: () => import('@/pages/register.vue'),
+      },
+      {
+        path: '/:pathMatch(.*)*',
+        component: () => import('@/pages/[...error].vue'),
+      },
+    ],
+  },
   {
     path: '/',
     component: () => import('@/layouts/default.vue'),
@@ -131,34 +162,5 @@ export const routes = [
       },
     ],
   },
-  {
-    path: '/',
-    component: () => import('@/layouts/blank.vue'),
-    children: [
-      {
-        path: ':id',
-        component: () => import('@/views/customer/Data.vue'),
-      },
-      {
-        path: 'login',
-        component: () => import('@/pages/login.vue'),
-      },
-      {
-        path: 'signin',
-        component: () => import('@/pages/Signin.vue'),
-      },
-      {
-        path: 'logout',
-        component: () => import('@/pages/Logout.vue'),
-      },
-      {
-        path: 'register',
-        component: () => import('@/pages/register.vue'),
-      },
-      {
-        path: '/:pathMatch(.*)*',
-        component: () => import('@/pages/[...error].vue'),
-      },
-    ],
-  },
+ 
 ]

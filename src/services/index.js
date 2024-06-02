@@ -254,5 +254,11 @@ export default {
       return await axios.delete(api_url + `v1/reports/${report_id}`, auth)
     }
   },
-  
+
+  //customer
+  async customerProject(encrypted_url, auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/projects/customer/${encrypted_url}`, auth)
+    }
+  },
 }
