@@ -61,15 +61,18 @@ const convertStatus = (item, statuses) => {
         return "";
     }
 }
-
 const convertrtetretre = (item) => {
     let foundResponders = dataResponders.value.find(responders => responders.id === item);
     if (foundResponders) {
-        return ` <VAvatar  rounded="lg" size="60" class="me-6 my-2" image="${foundResponders.image}" />`;
+        if (foundResponders.image) {
+            return [foundResponders.image, "image"];
+        } else {
+            return [foundResponders.name, "name"];
+        }
     } else {
         return "";
     }
-}
+};
 
 const deleteReport = async (item, id) => {
     if (myConfirmDelRef.value) {
@@ -188,8 +191,18 @@ const saveReport = async (services_id, item, index) => {
     if (newItem.posting_date) {
         newItem.posting_date = formattedDateTosave(newItem.posting_date)
     }
+
+
+
     if (newItem.draft_date) {
         newItem.draft_date = formattedDateTosave(newItem.draft_date)
+    }
+    if (newItem.image) {
+        
+        if (newItem.image.startsWith('http://') || newItem.image.startsWith('https://')) {
+            delete newItem.image;
+        }
+
     }
     try {
         if (newItem.id) {
@@ -223,6 +236,57 @@ const editReport = async (index) => {
 
     editingReportIndex.value = index;
 }
+
+const openupload = (item, index) => {
+    console.log(item)
+    currentIndex = index
+    currentItem = item
+    refInputEl.value.click()
+}
+const refInputEl = ref()
+let currentIndex
+let currentItem
+const AddUploadImage = file => {
+
+
+    const fileReader = new FileReader();
+    const { files } = file.target;
+    if (files && files.length) {
+        const selectedFile = files[0];
+        if (selectedFile.size > 2 * 1024 * 1024) { // 2MB in bytes
+            Swal.fire({
+                text: "ภาพถ่ายต้องมีขนาด ไม่เกิน 2MB",
+                icon: 'error',
+                confirmButtonText: 'OK'
+            })
+            return;
+        }
+
+        const allowedFormats = ["image/jpeg", "image/jpg", "image/png"];
+        if (!allowedFormats.includes(selectedFile.type)) {
+            Swal.fire({
+                text: "ภาพถ่ายรองรับ jpg, jpeg, png เท่านั้น",
+                icon: 'error',
+                confirmButtonText: 'OK'
+            })
+            return;
+        }
+
+        overlay.value = true;
+        fileReader.readAsDataURL(selectedFile);
+        fileReader.onload = () => {
+            overlay.value = false;
+            if (typeof fileReader.result === 'string') {
+                currentItem.image = fileReader.result;
+            }
+        };
+    }
+}
+const removeImage = item => {
+    const fileInput = refInputEl.value
+    fileInput.value = '';
+    item.image = ''
+}
 </script>
 
 <template>
@@ -238,7 +302,10 @@ const editReport = async (index) => {
     <div>
         <h1>{{ Project_Id === "" ? 'เพิ่ม Project' : 'รายงาน Project' }}</h1>
     </div>
-
+    <VCardText>
+        <input ref="refInputEl" type="file" name="file" accept=".jpeg,.png,.jpg,GIF" hidden
+            @input="AddUploadImage($event, index)" />
+    </VCardText>
     <VRow class="match-height align-center justify-center mt-4">
         <VCol cols="12">
             <VCard class="my-8" v-for="(item, optionIndex) in dataProject.services" :key="optionIndex">
@@ -255,6 +322,7 @@ const editReport = async (index) => {
                     </VRow>
                 </VCardTitle>
                 <VCardText class="d-flex mt-2">
+
                     <VTable style="width: 100% !important;">
                         <thead>
                             <tr>
@@ -285,7 +353,11 @@ const editReport = async (index) => {
                                             </div>
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'responder_id'">
-                                            <div v-html="convertrtetretre(itemReport[itemC.ref_name])"></div>
+                                            <VAvatar v-if="convertrtetretre(itemReport[itemC.ref_name])[1] === 'image'"
+                                                rounded="lg" size="50" class="me-6 my-2"
+                                                :image="convertrtetretre(itemReport[itemC.ref_name])[0]" />
+                                            <span v-else>{{ convertrtetretre(itemReport[itemC.ref_name])[0]
+                                                }}</span>
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'image'">
                                             <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
@@ -319,15 +391,26 @@ const editReport = async (index) => {
                                         <template v-if="itemC.ref_name === 'status_id'">
                                             <VAutocomplete v-model="itemReport[itemC.ref_name]" autocomplete="no"
                                                 :items="item.statuses" item-title="name" item-value="id"
-                                                density="compact" clearable :placeholder="itemC.name"
-                                                :label="itemC.name" />
+                                                density="compact" clearable :placeholder="itemC.name" />
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'responder_id'">
-                                            <div v-html="convertrtetretre(itemReport[itemC.ref_name])"></div>
+                                            <VAutocomplete v-model="itemReport[itemC.ref_name]" autocomplete="no"
+                                                :items="dataResponders" item-title="name" item-value="id"
+                                                density="compact" clearable :placeholder="itemC.name" />
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'image'">
-                                            <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
-                                                class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
+                                            <VBadge v-if="itemReport.image" icon="ri-close-line" color="error"
+                                                @click="removeImage(itemReport)" class="v-badge--tonal my-4">
+                                                <VAvatar size="60">
+                                                    <VImg :src="itemReport.image" />
+                                                </VAvatar>
+                                            </VBadge>
+
+
+                                            <VBtn v-else variant="text" color="default"
+                                                @click="openupload(itemReport, indexReport)">
+                                                <VIcon size="35" class="bg-secondary" icon="ri-image-add-line" />
+                                            </VBtn>
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'draft_date'">
                                             <v-text-field color="primary"
@@ -399,22 +482,22 @@ const editReport = async (index) => {
                                             บันทึก Report
                                         </VTooltip>
                                     </VBtn>
-                                    <VBtn v-if="editingReportIndex !== indexReport" @click="deleteReport(item, itemReport.id)" icon size="x-small" color="error"
+                                    <VBtn v-if="editingReportIndex !== indexReport"
+                                        @click="deleteReport(item, itemReport.id)" icon size="x-small" color="error"
                                         variant="text">
                                         <VIcon class="me-1" icon="ri-delete-bin-6-line" size="22" />
                                         <VTooltip activator="parent" location="top">
                                             ลบ Report
                                         </VTooltip>
                                     </VBtn>
-                                    <VBtn  v-if="editingReportIndex === indexReport" @click="editingReportIndex = null" icon size="x-small" color="default"
-                                        variant="text">
+                                    <VBtn v-if="editingReportIndex === indexReport" @click="editingReportIndex = null"
+                                        icon size="x-small" color="default" variant="text">
                                         <VIcon class="me-1" icon="ri-close-fill" size="22" />
                                         <VTooltip activator="parent" location="top">
                                             ยกเลิกแก้ไข Report
                                         </VTooltip>
                                     </VBtn>
                                 </td>
-
                                 <!-- No id -->
                                 <td v-if="itemReport.id === null" class="text-uppercase text-center "
                                     v-for="(itemC, indexC) in item.columns" :key="indexC">
@@ -424,11 +507,25 @@ const editReport = async (index) => {
                                             clearable :placeholder="itemC.name" :label="itemC.name" />
                                     </template>
                                     <template v-else-if="itemC.ref_name === 'responder_id'">
-                                        <div v-html="convertrtetretre(itemReport[itemC.ref_name])"></div>
+                                        <VAutocomplete v-model="itemReport[itemC.ref_name]" autocomplete="no"
+                                            :items="dataResponders" item-title="name" item-value="id" density="compact"
+                                            clearable :placeholder="itemC.name" />
                                     </template>
                                     <template v-else-if="itemC.ref_name === 'image'">
-                                        <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
-                                            class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
+                                        <VBadge v-if="itemReport.image" icon="ri-close-line" color="error"
+                                            @click="removeImage(itemReport)" class="v-badge--tonal my-4">
+                                            <VAvatar size="60">
+                                                <VImg :src="itemReport.image" />
+                                            </VAvatar>
+                                        </VBadge>
+
+
+                                        <VBtn v-else variant="text" color="default"
+                                            @click="openupload(itemReport, indexReport)">
+                                            <VIcon size="35" class="bg-secondary" icon="ri-image-add-line" />
+                                        </VBtn>
+
+
                                     </template>
                                     <template v-else-if="itemC.ref_name === 'draft_date'">
                                         <v-text-field color="primary" :value="formattedDate(itemReport[itemC.ref_name])"
