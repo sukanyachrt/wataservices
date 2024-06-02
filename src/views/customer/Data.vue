@@ -1,5 +1,5 @@
 <script setup>
-import { formatDate_notime } from '@/plugins/function.js'
+import { formatDate_notime, compareDates } from '@/plugins/function.js'
 import ConfirmPasscode from '@/views/customer/ConfirmPasscode.vue'
 import services from '@/services'
 import Swal from 'sweetalert2'
@@ -85,17 +85,24 @@ const getData = async (auth) => {
             </v-progress-circular>
         </v-overlay>
     </div>
-    <VRow class="align-top justify-center px-4"  v-if="visible">
+    <VRow class="align-top justify-center px-4" v-if="visible">
         <VCol cols="12">
             <VRow class="align-start justify-start mt-2 mx-4">
                 <VCol cols="12">
                     <VAlert border="start" color="primary" variant="tonal">
                         <h1 class="my-4">{{ dataProject.name }}</h1>
                     </VAlert>
+                    
 
                 </VCol>
+                <VCol cols="12" class="d-flex align-center justify-start justify-md-end">
+                    <VBtn class="ms-2"
+                        :color="compareDates(dataProject.starting_date, dataProject.finishing_date).color">
+                        {{ compareDates(dataProject.starting_date, dataProject.finishing_date).status }}
+                    </VBtn>
+                </VCol>
                 <VCol cols="12">
-                    <VCard class="my-8" v-for="(item, optionIndex) in dataProject.services" :key="optionIndex">
+                    <VCard class="mb-8" v-for="(item, optionIndex) in dataProject.services" :key="optionIndex">
                         <VCardTitle>
                             <VRow>
                                 <VCol cols="12" md="6">

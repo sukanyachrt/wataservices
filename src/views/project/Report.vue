@@ -3,7 +3,7 @@ import Swal from 'sweetalert2'
 import Cookies from 'js-cookie'
 import services from '@/services'
 import myDialog from '@/components/Dialog.vue'
-import { formatDate_notime } from '@/plugins/function.js'
+import { formatDate_notime,compareDates } from '@/plugins/function.js'
 import { useAccountStore } from '@/plugins/store';
 import { useRouter, useRoute } from 'vue-router';
 
@@ -198,7 +198,7 @@ const saveReport = async (services_id, item, index) => {
         newItem.draft_date = formattedDateTosave(newItem.draft_date)
     }
     if (newItem.image) {
-        
+
         if (newItem.image.startsWith('http://') || newItem.image.startsWith('https://')) {
             delete newItem.image;
         }
@@ -287,6 +287,7 @@ const removeImage = item => {
     fileInput.value = '';
     item.image = ''
 }
+
 </script>
 
 <template>
@@ -299,14 +300,20 @@ const removeImage = item => {
             </v-progress-circular>
         </v-overlay>
     </div>
-    <div>
-        <h1>{{ dataProject.name }}</h1>
-    </div>
-    <VCardText>
+    <VRow>
+       <VCol cols="12" md="6">
+            <h1>{{ dataProject.name }}</h1>
+        </VCol>
+        <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
+            <VBtn class="ms-2" :color="compareDates(dataProject.starting_date, dataProject.finishing_date).color">
+                {{ compareDates(dataProject.starting_date, dataProject.finishing_date).status }}
+            </VBtn>
+        </VCol>
         <input ref="refInputEl" type="file" name="file" accept=".jpeg,.png,.jpg,GIF" hidden
             @input="AddUploadImage($event, index)" />
-    </VCardText>
-    <VRow class="match-height align-center justify-center mt-4">
+    </VRow>
+
+    <VRow class="match-height align-center justify-center">
         <VCol cols="12">
             <VCard class="my-8" v-for="(item, optionIndex) in dataProject.services" :key="optionIndex">
                 <VCardTitle>
