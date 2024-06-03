@@ -20,7 +20,7 @@ const isPasswordVisible = ref(false)
 onMounted(async () => {
   const loggedIn =await Cookies.get('wataservices_token')
   if (loggedIn) {
-    router.push("/platforms");
+    router.push("/project-table");
   }
   else{
     overlay.value=false
@@ -64,7 +64,7 @@ const Signin = async () => {
         const newUser = store.encryptAndStoreData(user)
         store.dataUser = newUser
 
-        router.push(`platforms`)
+        router.push(`project-table`)
 
       } else {
         overlay.value = false

@@ -138,39 +138,31 @@ const InsertUser =async ()=>{
         })
     }
 }
-
 const UpdateUser = async () => {
     try {
         const modifiedFields = getModifiedFields(initialFormState.value, formCreate.value);
-        modifiedFields.role_id = formCreate.value.role_id;
-        if (Object.keys(modifiedFields).length === 1 && modifiedFields.hasOwnProperty('role_id')) {
-            if (ImageForm.value.image === '') {
-                router.push('/users')
-                return;
-            }
-            else {
-                let res = {
-                    "data": {
-                        "status": "Successful",
-                        "message": "Team member ryye55ff updated Successfully",
-                        "data": {
-                            "id": User_Id.value
-                        }
-                    }
-                }
-                await InsertImage(res);
-                return;
-            }
 
+        // Include the role_id in the modified fields if it has changed or if it's not already included
+        if (initialFormState.value.role_id !== formCreate.value.role_id || !modifiedFields.hasOwnProperty('role_id')) {
+            modifiedFields.role_id = formCreate.value.role_id;
         }
 
+        // If there are no modified fields and no new image, show no changes detected message
+        if (Object.keys(modifiedFields).length === 0 && ImageForm.value.image === '') {
+            Swal.fire({
+                text: 'No changes detected.',
+                icon: 'info',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Proceed with the update if there are modified fields or a new image
         const response = await services.userUpdate(User_Id.value, modifiedFields, auth);
         if (response.data.status === "Successful") {
             if (ImageForm.value.image !== '') {
-
                 await InsertImage(response);
-            }
-            else {
+            } else {
                 Swal.fire({
                     position: "top-end",
                     icon: "success",
@@ -178,21 +170,19 @@ const UpdateUser = async () => {
                     showConfirmButton: false,
                     timer: 2000
                 });
-                router.push('/users')
+                router.push('/users');
             }
-
-
-
         }
-
     } catch (error) {
         Swal.fire({
             text: error.response.data.message,
             icon: 'error',
             confirmButtonText: 'OK'
-        })
+        });
     }
-}
+};
+
+
 const InsertImage = async (response) => {
     let dataImage = {
         "image": ImageForm.value.image
@@ -226,7 +216,8 @@ const getModifiedFields = (initial, current) => {
         }
     }
     return modified;
-}
+};
+
 
 
 const changeLogo = file => {
@@ -348,7 +339,15 @@ const resetImage = () => {
                                     :type="isPasswordVisible ? 'text' : 'password'"
                                     :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
                                     @click:append-inner="isPasswordVisible = !isPasswordVisible"
-                                    label="Password ของ user" :rules="[v => !!v || 'โปรดกรอก Password ของ user']"
+                                    label="Password ของ user" required :rules="[v => !!v || 'โปรดกรอก Password ของ user']"
+                                    density="compact" />
+                            </VCol>
+                            <VCol cols="12" md="6" v-if="User_Id.value!==''">
+                                <VTextField v-model="formCreate.password" placeholder="············"
+                                    :type="isPasswordVisible ? 'text' : 'password'"
+                                    :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
+                                    @click:append-inner="isPasswordVisible = !isPasswordVisible"
+                                    label="Password ของ user"  
                                     density="compact" />
                             </VCol>
                             <VCol cols="12">
