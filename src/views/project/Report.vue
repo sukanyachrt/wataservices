@@ -3,7 +3,7 @@ import Swal from 'sweetalert2'
 import Cookies from 'js-cookie'
 import services from '@/services'
 import myDialog from '@/components/Dialog.vue'
-import { formatDate_notime,compareDates } from '@/plugins/function.js'
+import { formatDate_notime, compareDates } from '@/plugins/function.js'
 import { useAccountStore } from '@/plugins/store';
 import { useRouter, useRoute } from 'vue-router';
 
@@ -301,8 +301,9 @@ const removeImage = item => {
         </v-overlay>
     </div>
     <VRow>
-       <VCol cols="12" md="6">
+        <VCol cols="12" md="6">
             <h1>{{ dataProject.name }}</h1>
+
         </VCol>
         <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
             <VBtn class="ms-2" :color="compareDates(dataProject.starting_date, dataProject.finishing_date).color">
@@ -320,7 +321,10 @@ const removeImage = item => {
                     <VRow>
                         <VCol cols="12" md="6">
                             <span> {{ item.name }}</span>
+
+
                         </VCol>
+
                         <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
                             เครดิต : <VBtn class="ms-2" color="success" variant="outlined">
                                 {{ item.success }} / {{ item.credit }}
@@ -340,7 +344,7 @@ const removeImage = item => {
                                 <th>
                                     บันทึกภายใน
                                 </th>
-                                <th style="background-color: #fff !important;" class="text-end">
+                                <th style="background-color: #fff !important;" class="text-end" v-if="item.id>0&& item.project_service_id>0">
                                     <VBtn @click="AddReports(item.columns, item.reports)" rounded="lg" color="primary"
                                         size="small">
                                         <VIcon start icon="ri-add-circle-fill" />
@@ -348,10 +352,11 @@ const removeImage = item => {
                                     </VBtn>
                                 </th>
                             </tr>
-
                         </thead>
                         <tbody>
-                            <tr v-for="(itemReport, indexReport) in item.reports" :key="indexReport">
+
+                            <tr v-if="item.id > 0 && item.project_service_id > 0"
+                                v-for="(itemReport, indexReport) in item.reports" :key="indexReport">
                                 <td v-if="itemReport.id > 0" class="text-uppercase text-center"
                                     v-for="(itemC, indexC) in item.columns" :key="indexC">
                                     <template v-if="editingReportIndex !== indexReport">
@@ -460,13 +465,14 @@ const removeImage = item => {
                                     </template>
                                 </td>
                                 <td
-                                    v-if="itemReport.id > 0 && (itemReport.inner_note === null || itemReport.inner_note)">
+                                    v-if="itemReport.id > 0 && (itemReport.inner_note === null || itemReport.inner_note === '' || itemReport.inner_note !== '')">
 
                                     <template v-if="editingReportIndex !== indexReport">
                                         {{ itemReport.inner_note }}
                                     </template>
                                     <template v-else>
-                                        <template v-if="itemReport.inner_note === null || itemReport.inner_note">
+                                        <template
+                                            v-if="itemReport.inner_note === null || itemReport.inner_note === '' || itemReport.inner_note !== ''">
                                             <VTextField v-model="itemReport.inner_note" placeholder="บันทึกภายใน"
                                                 variant="outlined" autocomplete="no" density="compact">
                                             </VTextField>
@@ -591,6 +597,59 @@ const removeImage = item => {
                                         </VTooltip>
                                     </VBtn>
                                 </td>
+                            </tr>
+                            <!-- id=null and  project_service_id==null-->
+                            <tr v-if="item.id === null && item.project_service_id === null"
+                                v-for="(itemReport, indexReport) in item.reports" :key="indexReport">
+                                <td class="text-uppercase text-left" v-for="(itemC, indexC) in item.columns"
+                                    :key="indexC">
+                                    <template v-if="itemC.ref_name === 'status_id' || itemC.ref_name === 'status'">
+                                        <div v-html="convertStatus(itemReport[itemC.ref_name], item.statuses)">
+                                        </div>
+                                    </template>
+
+                                    <template v-else-if="itemC.ref_name === 'responder_id'">
+                                        <VAvatar v-if="convertrtetretre(itemReport[itemC.ref_name])[1] === 'image'"
+                                            rounded="lg" size="50" class="me-6 my-2"
+                                            :image="convertrtetretre(itemReport[itemC.ref_name])[0]" />
+                                        <span v-else>{{ convertrtetretre(itemReport[itemC.ref_name])[0]
+                                            }}</span>
+                                    </template>
+                                    <template v-else-if="itemC.ref_name === 'image'">
+                                        <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
+                                            class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
+                                    </template>
+                                    <template v-else-if="itemC.ref_name === 'draft_date'">
+                                        <span v-if="itemReport[itemC.ref_name]">
+                                            {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                        </span>
+                                    </template>
+                                    <template v-else-if="itemC.ref_name === 'posting_date'">
+                                        <span v-if="itemReport[itemC.ref_name]">
+                                            {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                        </span>
+                                    </template>
+                                    <template v-else-if="itemC.ref_name === 'schedule'">
+                                        <span v-if="itemReport[itemC.ref_name]">
+                                            {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                        </span>
+                                    </template>
+                                    <template v-else-if="itemC.ref_name === 'url'">
+                                        <template v-if="itemReport[itemC.ref_name]">
+                                            <a :href="itemReport[itemC.ref_name]" target="_blank">ลิงค์</a>
+                                        </template>
+
+                                    </template>
+                                    <template v-else-if="itemReport.inner_note">
+                                        {{ itemReport.itemReport.inner_note }}
+                                    </template>
+                                    <template v-else>
+                                        {{ itemReport[itemC.ref_name] }}
+                                    </template>
+
+
+                                </td>
+
                             </tr>
                         </tbody>
                     </VTable>

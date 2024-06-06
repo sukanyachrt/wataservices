@@ -163,6 +163,13 @@ export default {
       return `${encrypted_url}`
     }
   },
+  async projectTimeline(auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/projects/timeline`, auth)
+    }
+  },
+
+
   // === teams ===
   async teams(page_number, auth) {
     if (checkCookie()) {

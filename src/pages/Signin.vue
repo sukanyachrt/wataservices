@@ -20,7 +20,14 @@ const isPasswordVisible = ref(false)
 onMounted(async () => {
   const loggedIn =await Cookies.get('wataservices_token')
   if (loggedIn) {
-    router.push("/project-table");
+    let dataUser = store.decryptData(store.dataUser);
+    if(dataUser.userRole == 'admin'){
+      router.push("/project-table");
+    }
+    else  if(dataUser.userRole == 'commenter'){
+      router.push("/project-timeline");
+    }
+    
   }
   else{
     overlay.value=false
@@ -48,7 +55,6 @@ const Signin = async () => {
         Cookies.set('wataservices_token', newToken, {
           expires: expirationDate,
         });
-        console.log(response.data.data)
         const user = {
           firstname: response.data.data.user.firstname,
           lastname: response.data.data.user.lastname,
@@ -63,8 +69,13 @@ const Signin = async () => {
 
         const newUser = store.encryptAndStoreData(user)
         store.dataUser = newUser
-
-        router.push(`project-table`)
+        if(user.userRole==='admin'){
+          router.push(`project-table`)
+        }
+        else{
+          router.push(`project-timeline`)
+        }
+        
 
       } else {
         overlay.value = false

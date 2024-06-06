@@ -2,25 +2,28 @@
 import VerticalNavSectionTitle from '@/@layouts/components/VerticalNavSectionTitle.vue';
 import VerticalNavLink from '@layouts/components/VerticalNavLink.vue';
 import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
+import { useAccountStore } from '@/plugins/store'
+const store = useAccountStore()
+let dataUser = ref(store.decryptData(store.dataUser));
 </script>
 
 <template>
  
- <VerticalNavLink
+ <VerticalNavLink v-if="dataUser.userRole == 'admin'"
     :item="{
       title: 'Platforms',
       icon: 'ri-list-view',
       to: '/platforms',
     }"
   />
-  <VerticalNavLink
+  <VerticalNavLink v-if="dataUser.userRole == 'admin'"
     :item="{
       title: 'Services',
       icon: 'ri-service-line',
       to: '/services',
     }"
   />
-  <VerticalNavGroup
+  <VerticalNavGroup v-if="dataUser.userRole == 'admin'"
     
     :item="{
       title: 'Project',
@@ -28,18 +31,27 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
       to: '/project',
     }"
   >
-    <VerticalNavLink
+    <VerticalNavLink v-if="dataUser.userRole == 'admin'"
       :item="{
         title: 'Dashboard',
         to: '/project-dashboard',
+        icon: 'ri-dashboard-fill'
       }"
     />
-    <VerticalNavLink
+    <VerticalNavLink v-if="dataUser.userRole == 'admin'"
       :item="{
         title: 'Table',
         to: '/project-table',
+        icon: 'ri-table-2'
       }"
     />
+    <VerticalNavLink v-if="dataUser.userRole == 'admin'"
+    :item="{
+      title: 'timeline',
+      icon: 'ri-timeline-view',
+      to: '/project-timeline',
+    }"
+  />
   </VerticalNavGroup> 
   <!-- <VerticalNavLink
     :item="{
@@ -48,18 +60,26 @@ import VerticalNavGroup from '@layouts/components/VerticalNavGroup.vue'
       to: '/project',
     }"
   /> -->
-  <VerticalNavLink
+  <VerticalNavLink v-if="dataUser.userRole == 'admin'"
     :item="{
       title: 'Team ',
       icon: 'ri-team-line',
       to: '/teams',
     }"
   />
-  <VerticalNavLink
+  <VerticalNavLink v-if="dataUser.userRole == 'admin'"
     :item="{
       title: 'User',
       icon: 'ri-user-fill',
       to: '/users',
+    }"
+  />
+
+   <VerticalNavLink v-if="dataUser.userRole == 'commenter'"
+    :item="{
+      title: 'Project',
+      icon: 'ri-list-check-3',
+      to: '/project-timeline',
     }"
   />
   

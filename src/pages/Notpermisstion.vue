@@ -23,7 +23,7 @@ let status = route.query.status || 'Not Permission'
           <v-col cols="12">
             <template v-if="status !== 'Not Permission'">
               <v-btn
-                :to="{ path: '/dataforms' }"
+                :to="{ path: '/signin' }"
                 dark
               >
                 <v-icon left>ri-arrow-left-line</v-icon>
@@ -32,7 +32,7 @@ let status = route.query.status || 'Not Permission'
             </template>
             <template v-else>
               <v-btn
-                :to="{ path: '/signin' }"
+                :to="{ path: '/logout' }"
                 dark
               >
                 <v-icon left>ri-arrow-left-line</v-icon>

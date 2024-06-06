@@ -29,6 +29,10 @@ export const routes = [
         path: '/:pathMatch(.*)*',
         component: () => import('@/pages/[...error].vue'),
       },
+      {
+        path: 'notpermission',
+        component: () => import('@/pages/Notpermisstion.vue'),
+      },
     ],
   },
   {
@@ -41,6 +45,7 @@ export const routes = [
         meta: {
           title: 'platforms',
           requiresAuth: true,
+          roles: ['admin'],
         },
       },
       {
@@ -49,6 +54,7 @@ export const routes = [
         meta: {
           title: 'services',
           requiresAuth: true,
+          roles: ['admin'],
         },
       },
       {
@@ -57,6 +63,7 @@ export const routes = [
         meta: {
           title: 'services-create',
           requiresAuth: true,
+          roles: ['admin'],
         },
       },
       {
@@ -65,6 +72,7 @@ export const routes = [
         meta: {
           title: 'project-dashboard',
           requiresAuth: true,
+          roles: ['admin'],
         },
       },
       {
@@ -73,6 +81,16 @@ export const routes = [
         meta: {
           title: 'project-table',
           requiresAuth: true,
+          roles: ['admin'],
+        },
+      },
+      {
+        path: 'project-timeline',
+        component: () => import('@/views/project/Timeline.vue'),
+        meta: {
+          title: 'project-timeline',
+          requiresAuth: true,
+          roles: ['admin','commenter'],
         },
       },
       {
@@ -81,6 +99,7 @@ export const routes = [
         meta: {
           title: 'project-create',
           requiresAuth: true,
+          roles: ['admin'],
         },
       },
       {
@@ -97,6 +116,7 @@ export const routes = [
         meta: {
           title: 'teams',
           requiresAuth: true,
+          roles: ['admin'],
         },
       },
       {
@@ -105,6 +125,7 @@ export const routes = [
         meta: {
           title: 'project-create',
           requiresAuth: true,
+          roles: ['admin'],
         },
       },
       {
@@ -113,6 +134,7 @@ export const routes = [
         meta: {
           title: 'users',
           requiresAuth: true,
+          roles: ['admin'],
         },
       },
       {
@@ -121,6 +143,7 @@ export const routes = [
         meta: {
           title: 'users-create',
           requiresAuth: true,
+          roles: ['admin'],
         },
       },
 
@@ -160,6 +183,7 @@ export const routes = [
         path: 'form-layouts',
         component: () => import('@/pages/form-layouts.vue'),
       },
+     
     ],
   },
  

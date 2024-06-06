@@ -121,6 +121,7 @@ const PaginationsProject = async () => {
         <VCol cols="12" md="6">
             <h1>Project</h1>
         </VCol>
+      
         <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
             <VBtnToggle v-model="toggleExclusive" density="compact" color="primary">
                 <VBtn to="/project-dashboard">
