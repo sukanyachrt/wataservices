@@ -94,6 +94,15 @@ export const routes = [
         },
       },
       {
+        path: 'project-timeline/:id',
+        component: () => import('@/views/project/Detailtimeline.vue'),
+        meta: {
+          title: 'project-timelinedetail',
+          requiresAuth: true,
+          roles: ['admin','commenter'],
+        },
+      },
+      {
         path: 'project-create/:id?',
         component: () => import('@/views/project/Create.vue'),
         meta: {

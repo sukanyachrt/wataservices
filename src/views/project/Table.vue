@@ -40,21 +40,27 @@ const getdataProjects = async (page) => {
         }
     } catch (error) {
         overlay.value = false
-        if (error) {
+        overlay.value = false
+        console.log(error)
+        if (error.response.status === 401) {
+            router.push('/logout')
             Swal.fire({
-                title: error.name,
-                text: error.message,
-                allowOutsideClick: false, // ไม่ให้ปิดโดยการคลิกภายนอก modal
-                allowEscapeKey: false, // ไม่ให้ปิดโดยการกดปุ่ม Esc
-                icon: 'warning',
-                confirmButtonText: 'OK'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    router.push('/logout')
-                }
+                position: "top-end",
+                icon: "error",
+                title: error.response.data.message,
+                showConfirmButton: false,
+                timer: 2000
             });
 
-
+        }
+        else {
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: error.response.data.message,
+                showConfirmButton: false,
+                timer: 2000
+            });
         }
     }
 }

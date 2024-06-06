@@ -9,7 +9,8 @@ import { useRouter, useRoute } from 'vue-router';
 
 const store = useAccountStore();
 const newToken = store.decryptData(Cookies.get('wataservices_token'));
-
+console.log(newToken)
+let dataUser = ref(store.decryptData(store.dataUser));
 let auth = {
     headers: {
         'Content-Type': 'application/json',
@@ -45,11 +46,27 @@ const reportProject = async () => {
     } catch (error) {
         overlay.value = false
         console.log(error)
-        Swal.fire({
-            text: error.response.data.message,
-            icon: 'error',
-            confirmButtonText: 'OK'
-        })
+        if (error.response.status === 401) {
+            router.push('/logout')
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: error.response.data.message,
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+        }
+        else {
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: error.response.data.message,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
     }
 }
 
@@ -344,7 +361,8 @@ const removeImage = item => {
                                 <th>
                                     บันทึกภายใน
                                 </th>
-                                <th style="background-color: #fff !important;" class="text-end" v-if="item.id>0&& item.project_service_id>0">
+                                <th style="background-color: #fff !important;" class="text-end"
+                                    v-if="(item.id > 0 && item.project_service_id > 0) && dataUser.userRole === 'admin'">
                                     <VBtn @click="AddReports(item.columns, item.reports)" rounded="lg" color="primary"
                                         size="small">
                                         <VIcon start icon="ri-add-circle-fill" />
@@ -393,6 +411,13 @@ const removeImage = item => {
                                             </template>
 
                                         </template>
+                                        <template v-else-if="itemC.ref_name === 'group_link'">
+                                            <template v-if="itemReport[itemC.ref_name]">
+                                                <a :href="itemReport[itemC.ref_name]" target="_blank">ลิงค์</a>
+                                            </template>
+
+                                        </template>
+
 
                                         <template v-else>
                                             {{ itemReport[itemC.ref_name] }}

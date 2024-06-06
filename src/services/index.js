@@ -168,6 +168,11 @@ export default {
       return await axios.get(api_url + `v1/projects/timeline`, auth)
     }
   },
+  async projectTimelineByIdproject(project_id,auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/projects/${project_id}/timeline`, auth)
+    }
+  },
 
 
   // === teams ===

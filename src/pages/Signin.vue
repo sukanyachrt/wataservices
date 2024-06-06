@@ -18,19 +18,19 @@ const formRef = ref(null)
 const formSignin = ref(structuredClone(form))
 const isPasswordVisible = ref(false)
 onMounted(async () => {
-  const loggedIn =await Cookies.get('wataservices_token')
+  const loggedIn = await Cookies.get('wataservices_token')
   if (loggedIn) {
     let dataUser = store.decryptData(store.dataUser);
-    if(dataUser.userRole == 'admin'){
+    if (dataUser.userRole == 'admin') {
       router.push("/project-table");
     }
-    else  if(dataUser.userRole == 'commenter'){
+    else if (dataUser.userRole == 'commenter') {
       router.push("/project-timeline");
     }
-    
+
   }
-  else{
-    overlay.value=false
+  else {
+    overlay.value = false
   }
 })
 
@@ -47,7 +47,7 @@ const Signin = async () => {
 
       const response = await services.login(formSignin.value, auth)
       if (response.data.status === 'Successful') {
-        
+
         const expirationDate = new Date()
         const token = response.data.data.token;
         const newToken = await store.encryptAndStoreData(token)
@@ -63,19 +63,19 @@ const Signin = async () => {
           username: formSignin.value.email,
           password: formSignin.value.password,
           remember: formSignin.value.remember,
-          userRole : response.data.data.user.userRole
+          userRole: response.data.data.user.userRole
         }
         overlay.value = false
 
         const newUser = store.encryptAndStoreData(user)
         store.dataUser = newUser
-        if(user.userRole==='admin'){
+        if (user.userRole === 'admin') {
           router.push(`project-table`)
         }
-        else{
+        else {
           router.push(`project-timeline`)
         }
-        
+
 
       } else {
         overlay.value = false
@@ -88,13 +88,25 @@ const Signin = async () => {
 
     } catch (error) {
       overlay.value = false
-      console.log(error)
-      Swal.fire({
-        title: error.name,
-        text: error.message,
-        icon: 'error',
-        confirmButtonText: 'OK'
-      })
+      if (error.response.status === 401) {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: error.response.data.message,
+          showConfirmButton: false,
+          timer: 2000
+        });
+
+      }
+      else {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: error.response.data.message,
+          showConfirmButton: false,
+          timer: 2000
+        });
+      }
     }
   } else {
     console.log(valid)
@@ -112,16 +124,16 @@ const Signin = async () => {
       </v-progress-circular>
     </v-overlay>
   </div>
-  <div v-if="overlay===false" class="auth-wrapper d-flex align-center justify-center pa-4">
+  <div v-if="overlay === false" class="auth-wrapper d-flex align-center justify-center pa-4">
     <VCard class="auth-card pa-4 pt-7" max-width="448">
       <VCardItem class="justify-center">
         <template #prepend>
           <div class="d-flex">
-           <VAvatar rounded="lg" size="120" :image="logowata" class="mx-4"/>
+            <VAvatar rounded="lg" size="120" :image="logowata" class="mx-4" />
           </div>
         </template>
 
-       </VCardItem>
+      </VCardItem>
 
       <VCardText class="pt-2 text-center">
         <h5 class="text-h5 font-weight-semibold mb-1">Welcome to Wata Services! 👋🏻</h5>
@@ -134,7 +146,7 @@ const Signin = async () => {
             <!-- email / username-->
             <VCol cols="12">
               <VTextField v-model="formSignin.email" label="Email / Username" type="text"
-                :rules="[v => !!v || 'โปรดกรอก Email / Username']" required />
+                :rules="[v => !!v || 'โปรดกรอก Email / Username']" required @keyup.enter="Signin" />
             </VCol>
 
             <!-- password -->
@@ -142,7 +154,7 @@ const Signin = async () => {
               <VTextField required :rules="[v => !!v || 'โปรดกรอก Password']" v-model="formSignin.password"
                 label="Password" placeholder="············" :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
-                @click:append-inner="isPasswordVisible = !isPasswordVisible" />
+                @click:append-inner="isPasswordVisible = !isPasswordVisible" @keyup.enter="Signin" />
 
 
 

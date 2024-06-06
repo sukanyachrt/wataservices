@@ -40,6 +40,28 @@ const getdataProjectDashboard = async () => {
     } catch (error) {
         console.log(error)
         overlay.value = false
+        overlay.value = false
+        console.log(error)
+        if (error.response.status === 401) {
+            router.push('/logout')
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: error.response.data.message,
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+        }
+        else {
+            Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: error.response.data.message,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
     }
 }
 

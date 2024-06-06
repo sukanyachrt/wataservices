@@ -77,7 +77,7 @@ let dataUser = ref(store.decryptData(store.dataUser));
 
    <VerticalNavLink v-if="dataUser.userRole == 'commenter'"
     :item="{
-      title: 'Project',
+      title: 'Project-Timeline',
       icon: 'ri-list-check-3',
       to: '/project-timeline',
     }"
