@@ -223,6 +223,7 @@ const saveReport = async (services_id, item, index) => {
     }
     try {
         if (newItem.id) {
+            console.log(newItem)
             const response = await services.reportUpdate(newItem.id, newItem, auth);
             if (response.data.status === "Successful") {
                 await reportProject();
@@ -377,7 +378,7 @@ const removeImage = item => {
                                 v-for="(itemReport, indexReport) in item.reports" :key="indexReport">
                                 <td v-if="itemReport.id > 0" class="text-uppercase text-center"
                                     v-for="(itemC, indexC) in item.columns" :key="indexC">
-                                    <template v-if="editingReportIndex !== indexReport">
+                                    <template v-if="editingReportIndex !== itemReport.id">
                                         <template v-if="itemC.ref_name === 'status_id'">
                                             <div v-html="convertStatus(itemReport[itemC.ref_name], item.statuses)">
                                             </div>
@@ -395,7 +396,7 @@ const removeImage = item => {
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'draft_date'">
                                             <span v-if="itemReport[itemC.ref_name]">
-                                                {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                          {{itemReport}}  {{ formatDate_notime(itemReport[itemC.ref_name]) }}
                                             </span>
 
 
@@ -492,7 +493,7 @@ const removeImage = item => {
                                 <td
                                     v-if="itemReport.id > 0 && (itemReport.inner_note === null || itemReport.inner_note === '' || itemReport.inner_note !== '')">
 
-                                    <template v-if="editingReportIndex !== indexReport">
+                                    <template v-if="editingReportIndex !== itemReport.id">
                                         {{ itemReport.inner_note }}
                                     </template>
                                     <template v-else>
@@ -505,14 +506,14 @@ const removeImage = item => {
                                     </template>
                                 </td>
                                 <td v-if="itemReport.id > 0" class="text-end">
-                                    <VBtn v-if="editingReportIndex !== indexReport" @click="editReport(indexReport)"
+                                    <VBtn v-if="editingReportIndex !== itemReport.id" @click="editReport(itemReport.id)"
                                         icon color="warning" size="x-small" variant="text">
                                         <VIcon class="me-1" icon="ri-edit-box-line" size="22" />
                                         <VTooltip activator="parent" location="top">
                                             แก้ไข Report
                                         </VTooltip>
                                     </VBtn>
-                                    <VBtn v-if="editingReportIndex === indexReport"
+                                    <VBtn v-if="editingReportIndex === itemReport.id"
                                         @click="saveReport(item.id, itemReport, indexReport)" icon color="info"
                                         size="x-small" variant="text">
                                         <VIcon class="me-1" icon="ri-save-line" size="26" />
@@ -520,7 +521,7 @@ const removeImage = item => {
                                             บันทึก Report
                                         </VTooltip>
                                     </VBtn>
-                                    <VBtn v-if="editingReportIndex !== indexReport"
+                                    <VBtn v-if="editingReportIndex !== itemReport.id"
                                         @click="deleteReport(item, itemReport.id)" icon size="x-small" color="error"
                                         variant="text">
                                         <VIcon class="me-1" icon="ri-delete-bin-6-line" size="22" />
@@ -528,7 +529,7 @@ const removeImage = item => {
                                             ลบ Report
                                         </VTooltip>
                                     </VBtn>
-                                    <VBtn v-if="editingReportIndex === indexReport" @click="editingReportIndex = null"
+                                    <VBtn v-if="editingReportIndex === itemReport.id" @click="editingReportIndex = null"
                                         icon size="x-small" color="default" variant="text">
                                         <VIcon class="me-1" icon="ri-close-fill" size="22" />
                                         <VTooltip activator="parent" location="top">
