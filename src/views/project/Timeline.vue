@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue';
 import { formatDate_notime } from '@/plugins/function.js';
+import ReportById from '@/views/project/ReportById.vue'
 
 const store = useAccountStore();
 const newToken = store.decryptData(Cookies.get('wataservices_token'));
@@ -19,7 +20,7 @@ const router = useRouter()
 const overlay = ref(true);
 const data = ref([]);
 const grouped = ref({});
-
+const myReportByIdRef = ref(null)
 onMounted(async () => {
     await getdataTimeline();
 });
@@ -35,9 +36,7 @@ const getdataTimeline = async () => {
             overlay.value = false;
         }
     } catch (error) {
-        console.log(error);
         overlay.value = false;
-        overlay.value = false
         console.log(error)
         if (error.response.status === 401) {
             router.push('/logout')
@@ -105,6 +104,16 @@ const groupedReports = async () => {
     grouped.value = orderedGroups;
     return grouped.value;
 };
+const showDetailReport = async (report_id) => {
+    if (myReportByIdRef.value) {
+        const result = await myReportByIdRef.value.showDialog({
+            report_id,
+            auth
+        })
+        console.log(result) 
+    }
+}
+
 
 </script>
 
@@ -152,22 +161,23 @@ const groupedReports = async () => {
                                 </VListItemTitle>
                                 <VListItemSubtitle>รายละเอียดคอมเมนท์ในงาน : {{ report.comment }}
                                 </VListItemSubtitle>
+                                <template #append>
+                                    <VBtn @click="showDetailReport(report.id)" variant="text" color="primary"
+                                        icon="ri-article-line" />
+                                </template>
                             </VListItem>
                         </VList>
                         <VDivider />
                     </div>
                 </v-card-text>
-                <VCardText class="text-center">
+                <!-- <VCardText class="text-center">
                     <v-btn :to="`/project-report/${project.id}`" class="mx-2" color="primary" size="small">
                         <VIcon start icon="ri-article-line" /> report
                     </v-btn>
-                    <v-btn :to="`/project-timeline/${project.id}`" class="mx-2" color="primary" size="small"
-                        variant="outlined">
-                        <VIcon start icon="ri-timeline-view" />
-                        เพิ่มเติม
-                    </v-btn>
-                </VCardText>
+
+                </VCardText> -->
             </v-card>
         </v-timeline-item>
     </v-timeline>
+    <ReportById ref="myReportByIdRef" />
 </template>

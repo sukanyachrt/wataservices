@@ -245,6 +245,11 @@ export default {
   },
 
   // === report ===
+  async reportProjectbyIdreport(report_id, auth) {
+    if (checkCookie()) {
+      return await axios.get(api_url + `v1/reports/${report_id}/edit`, auth)
+    }
+  },
   async reportProject(project_id, auth) {
     if (checkCookie()) {
       return await axios.get(api_url + `v1/projects/${project_id}/reports`, auth)

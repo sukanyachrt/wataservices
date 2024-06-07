@@ -9,7 +9,6 @@ import { useRouter, useRoute } from 'vue-router';
 
 const store = useAccountStore();
 const newToken = store.decryptData(Cookies.get('wataservices_token'));
-console.log(newToken)
 let dataUser = ref(store.decryptData(store.dataUser));
 let auth = {
     headers: {
@@ -359,7 +358,7 @@ const removeImage = item => {
                                     :key="indexCol">
                                     {{ itemCol.name }}
                                 </th>
-                                <th>
+                                <th v-if="item.id>0">
                                     บันทึกภายใน
                                 </th>
                                 <th style="background-color: #fff !important;" class="text-end"
@@ -396,7 +395,7 @@ const removeImage = item => {
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'draft_date'">
                                             <span v-if="itemReport[itemC.ref_name]">
-                                          {{itemReport}}  {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                            {{ formatDate_notime(itemReport[itemC.ref_name]) }}
                                             </span>
 
 
