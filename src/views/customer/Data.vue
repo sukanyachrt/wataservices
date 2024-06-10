@@ -53,7 +53,6 @@ const getData = async (auth) => {
         const response = await services.customerProject(encrypted_url.value, auth);
         overlay.value = false
         if (response.data.status === "Successful") {
-            console.log(response.data.data.project)
             dataProject.value = response.data.data.project;
             visible.value = true
         }
