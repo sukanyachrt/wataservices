@@ -53,6 +53,7 @@ const getData = async (auth) => {
         const response = await services.customerProject(encrypted_url.value, auth);
         overlay.value = false
         if (response.data.status === "Successful") {
+            console.log(response.data.data.project)
             dataProject.value = response.data.data.project;
             visible.value = true
         }
@@ -133,10 +134,10 @@ const getData = async (auth) => {
                                 </thead>
                                 <tbody>
                                     <tr v-for="(itemReport, indexReport) in item.reports" :key="indexReport">
-                                        <td class="text-uppercase text-center" v-for="(itemC, indexC) in item.columns"
+                                        <td class="text-uppercase text-left" v-for="(itemC, indexC) in item.columns"
                                             :key="indexC">
 
-                                            <template v-if="itemC.ref_name === 'status_id'">
+                                            <template v-if="itemC.ref_name === 'status_id' || itemC.ref_name === 'status'">
                                                 <VChip
                                                     :style="{ backgroundColor: itemReport.status.color, 'color': '#fff' }"
                                                     variant="outlined" class="rounded">{{ itemReport.status.name }}
@@ -169,7 +170,13 @@ const getData = async (auth) => {
                                                     {{ formatDate_notime(itemReport[itemC.ref_name]) }}
                                                 </span>
                                             </template>
-                                            <template v-else-if="itemC.ref_name === 'url'">
+                                            <template v-else-if="itemC.ref_name === 'schedule'">
+                                                <span v-if="itemReport[itemC.ref_name]">
+                                                    {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                                </span>
+                                            </template>
+                                            
+                                            <template v-else-if="itemC.ref_name === 'url' || itemC.ref_name === 'group_link'">
                                                 <template v-if="itemReport[itemC.ref_name]">
                                                     <a :href="itemReport[itemC.ref_name]" target="_blank">ลิงค์</a>
                                                 </template>

@@ -266,7 +266,7 @@ const InsertLogo = async (response) => {
     </div>
 
     <div>
-        <h1>{{ Project_Id === "" ? 'เพิ่ม Services' : 'แก้ไข Services' }}</h1>
+        <h1>{{ Services_Id === "" ? 'เพิ่ม Services' : 'แก้ไข Services' }}</h1>
     </div>
 
     <VRow class="match-height align-center  justify-center mt-4">

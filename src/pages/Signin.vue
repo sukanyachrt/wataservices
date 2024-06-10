@@ -88,21 +88,33 @@ const Signin = async () => {
 
     } catch (error) {
       overlay.value = false
-      if (error.response.status === 401) {
-        Swal.fire({
-          position: "top-end",
-          icon: "error",
-          title: error.response.data.message,
-          showConfirmButton: false,
-          timer: 2000
-        });
+      if (error.response) {
+        if (error.response.status === 401) {
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: error.response.data.message,
+            showConfirmButton: false,
+            timer: 2000
+          });
 
+        }
+        else {
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: error.response.data.message,
+            showConfirmButton: false,
+            timer: 2000
+          });
+        }
       }
+
       else {
         Swal.fire({
           position: "top-end",
           icon: "error",
-          title: error.response.data.message,
+          title: error.message,
           showConfirmButton: false,
           timer: 2000
         });

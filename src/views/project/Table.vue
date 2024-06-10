@@ -14,6 +14,7 @@ let auth = {
         'Authorization': 'Bearer ' + newToken
     },
 }
+const router = useRouter()
 const toggleExclusive = ref(1)
 const overlay = ref(false)
 const dataprojects = ref([]);
@@ -22,7 +23,7 @@ const metaPage = ref([])
 const myConfirmDelRef = ref(null)
 const page = ref(1)
 onMounted(async () => {
-    await getdataProjects()
+    await getdataProjects(1)
    
 })
 const getdataProjects = async (page) => {
@@ -40,24 +41,36 @@ const getdataProjects = async (page) => {
         }
     } catch (error) {
         overlay.value = false
-        overlay.value = false
         console.log(error)
-        if (error.response.status === 401) {
-            router.push('/logout')
-            Swal.fire({
-                position: "top-end",
-                icon: "error",
-                title: error.response.data.message,
-                showConfirmButton: false,
-                timer: 2000
-            });
+        if (error.response) {
+            if (error.response.status === 401) {
+                
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: error.response.data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
 
+            }
+            else {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: error.response.data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
+            router.push('/logout')
         }
+
         else {
             Swal.fire({
                 position: "top-end",
                 icon: "error",
-                title: error.response.data.message,
+                title: error.message,
                 showConfirmButton: false,
                 timer: 2000
             });

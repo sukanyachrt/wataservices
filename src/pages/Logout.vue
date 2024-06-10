@@ -17,7 +17,7 @@ const logout = async () => {
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'https://wata-api.sawasdeehub.tech/api/logout',
+      url: 'https://wataservice-api.xcard.live/api/logout',
       headers: {
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + newToken

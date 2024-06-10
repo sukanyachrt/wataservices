@@ -29,7 +29,7 @@ const getdataTimeline = async () => {
     try {
         overlay.value = true;
         const response = await services.projectTimeline(auth);
-        console.log(response);
+       // console.log(response);
         if (response.data.status === 'Successful') {
             data.value = response.data.data;
             await groupedReports();
@@ -37,7 +37,7 @@ const getdataTimeline = async () => {
         }
     } catch (error) {
         overlay.value = false;
-        console.log(error)
+      //  console.log(error)
         if (error.response.status === 401) {
             router.push('/logout')
             Swal.fire({
@@ -110,7 +110,7 @@ const showDetailReport = async (report_id) => {
             report_id,
             auth
         })
-        console.log(result) 
+       // console.log(result) 
     }
 }
 
@@ -129,10 +129,10 @@ const showDetailReport = async (report_id) => {
     </div>
     <VRow>
         <VCol cols="12">
-            <h1>Timeline</h1>
+            <h1>Timeline </h1>
         </VCol>
     </VRow>
-    <v-timeline>
+    <v-timeline v-if="data.length>0">
         <v-timeline-item size="large" v-for="(projects, expected) in grouped" :key="expected" dot-color="primary">
             <template v-slot:opposite>
                 <v-card-title>
@@ -179,5 +179,16 @@ const showDetailReport = async (report_id) => {
             </v-card>
         </v-timeline-item>
     </v-timeline>
+    <VRow v-else class="text-center">
+        <VCol cols="12">
+            <h3></h3>
+            <v-alert border="start" color="deep-primary-accent-4" variant="tonal">
+                <template v-slot:title>
+                    ไม่มีข้อมูล
+                </template>
+
+            </v-alert>
+        </VCol>
+    </VRow>
     <ReportById ref="myReportByIdRef" />
 </template>

@@ -1,15 +1,11 @@
 <template>
    
-    <VDialog transition="dialog-top-transition" width="500" v-model="dialogVisible">
+    <VDialog transition="dialog-top-transition" width="500" v-model="dialogVisible" persistent>
         <VCard class="mt-6 border-t-xl border-primary border-opacity-100 border-4" title="ยืนยัน Passcode เพื่อเข้าดูรายงาน">
             <VCardText>
                 <VForm ref="formCreateRef">
                    <VRow class="justify-center align-center">
-                        <VCol cols="12">
-                            <VTextField v-model="formCreate.encrypted_url" required label="encrypted_url"
-                                :rules="[v => !!v || 'encrypted_url']" Readonly />
-                        </VCol>
-                        <VCol cols="12">
+                       <VCol cols="12">
                             <VTextField v-model="formCreate.passcode" required label="passcode"
                                 :rules="[v => !!v || 'passcode']"  />
                         </VCol>
@@ -42,8 +38,7 @@ const resolvePromise = ref()
 const rejectPromise = ref()
 const showForms = async data => {
   dialogVisible.value = true
-  console.log(data)
-
+  
 if(data){
     formCreate.value.encrypted_url = data
 }

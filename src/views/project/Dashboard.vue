@@ -16,6 +16,7 @@ let auth = {
         'Authorization': 'Bearer ' + newToken
     },
 }
+const router = useRouter()
 const toggleExclusive = ref(0)
 const overlay = ref(false)
 const myConfirmDelRef = ref(null)
@@ -23,7 +24,7 @@ const dataDashboard = ref([])
 const page = ref(1)
 onMounted(async () => {
     await getdataProjectDashboard()
-   
+
 })
 
 
@@ -32,36 +33,48 @@ const getdataProjectDashboard = async () => {
     try {
         overlay.value = true
         const response = await services.projectDashboard(auth);
-        console.log(response)
+        // console.log(response)
         if (response.data.status === "Successful") {
             overlay.value = false
             dataDashboard.value = response.data.data
         }
     } catch (error) {
-        console.log(error)
+        //  console.log(error)
         overlay.value = false
         overlay.value = false
-        console.log(error)
-        if (error.response.status === 401) {
-            router.push('/logout')
-            Swal.fire({
-                position: "top-end",
-                icon: "error",
-                title: error.response.data.message,
-                showConfirmButton: false,
-                timer: 2000
-            });
+        if (error.response) {
+            if (error.response.status === 401) {
+                router.push('/logout')
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: error.response.data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
 
+            }
+            else {
+                router.push('/logout')
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: error.response.data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
         }
         else {
             Swal.fire({
                 position: "top-end",
                 icon: "error",
-                title: error.response.data.message,
+                title: error.message,
                 showConfirmButton: false,
                 timer: 2000
             });
         }
+
     }
 }
 
@@ -104,7 +117,7 @@ const shareLink = async item => {
         </VCol>
         <VCol cols="12" md="6" class="d-flex align-center justify-start justify-md-end">
             <VBtnToggle v-model="toggleExclusive" density="compact" color="primary">
-                <VBtn >
+                <VBtn>
                     <VIcon class="me-1" icon="ri-dashboard-fill" size="22" />
                     <VTooltip activator="parent" location="top">
                         แสดงข้อมูลแบบ Dashboard
@@ -112,7 +125,7 @@ const shareLink = async item => {
                 </VBtn>
                 <VBtn to="/project-table">
                     <VIcon class="me-1" icon="ri-table-2" size="22" />
-                    <VTooltip  location="top">
+                    <VTooltip location="top">
                         แสดงข้อมูลแบบตาราง
                     </VTooltip>
                 </VBtn>
@@ -127,7 +140,7 @@ const shareLink = async item => {
             </VBtn>
         </VCol>
     </VRow>
-    
+
     <VRow v-if="dataDashboard.length > 0">
         <VCol cols="12" md="6" v-for="item in dataDashboard" :key="item.id">
             <VCard class="position-relative">
@@ -153,19 +166,22 @@ const shareLink = async item => {
 
                     </div>
 
-
-                    <!--                     
-                    <VBtn size="small" class="mt-5">
-                        Share
-                    </VBtn> -->
                 </VCardText>
-
-                <!-- Trophy -->
                 <VImg :src="item.logo" class="trophy" />
             </VCard>
         </VCol>
     </VRow>
+    <VRow v-else class="text-center">
+        <VCol cols="12">
+            <h3></h3>
+            <v-alert border="start" color="deep-primary-accent-4" variant="tonal">
+                <template v-slot:title>
+                    ไม่มีข้อมูล
+                </template>
 
+            </v-alert>
+        </VCol>
+    </VRow>
     <myDialog ref="myConfirmDelRef" />
     <Share ref="mySendSurveyRef" />
 
