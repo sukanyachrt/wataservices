@@ -1,6 +1,6 @@
 import axios from 'axios'
-//const api_url = 'https://wata-api.sawasdeehub.tech/api/'
-const api_url = 'https://wataservice-api.xcard.live/api/'
+const api_url = 'https://wata-api.sawasdeehub.tech/api/'
+//const api_url = 'https://wataservice-api.xcard.live/api/'
 import Cookies from 'js-cookie'
 export async function checkCookie() {
   if (Cookies.get('wataservices_token')) {

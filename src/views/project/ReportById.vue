@@ -2,8 +2,9 @@
 import Swal from 'sweetalert2'
 import services from '@/services'
 import { formatDate_notime, compareDates } from '@/plugins/function.js'
+import Showimage from '@/views/project/Showimage.vue'
 const overlay = ref(false);
-
+const myShowimageRef = ref(null)
 const dialogVisible = ref(false)
 const resolvePromise = ref()
 const rejectPromise = ref()
@@ -243,6 +244,15 @@ const removeImage = item => {
 }
 
 defineExpose({ showDialog })
+
+const showImage = async (image) => {
+    if (myShowimageRef.value) {
+        const result = await myShowimageRef.value.showDialog({
+            image
+        })
+        console.log(result)
+    }
+}
 </script>
 
 <template>
@@ -291,7 +301,7 @@ defineExpose({ showDialog })
                                             <template v-else-if="itemC.ref_name === 'image'">
                                                 <VBadge v-if="dataReport.image" icon="ri-close-line" color="error"
                                                     @click="removeImage(dataReport)" class="v-badge--tonal my-4">
-                                                    <VAvatar size="50">
+                                                    <VAvatar  size="50">
                                                         <VImg :src="dataReport.image" />
                                                     </VAvatar>
                                                 </VBadge>
@@ -356,7 +366,7 @@ defineExpose({ showDialog })
                                                     }}</span>
                                             </template>
                                             <template v-else-if="itemC.ref_name === 'image'">
-                                                <VAvatar v-if="dataReport[itemC.ref_name] !== ''" rounded="lg" size="50"
+                                                <VAvatar @click="showImage(dataReport[itemC.ref_name])" v-if="dataReport[itemC.ref_name] !== ''" rounded="lg" size="50"
                                                     class="me-6 my-2" :image="dataReport[itemC.ref_name]" />
                                             </template>
                                             <template
@@ -412,6 +422,7 @@ defineExpose({ showDialog })
             <VDivider class="my-1" />
         </VCard>
     </VDialog>
+    <Showimage ref="myShowimageRef" />
 </template>
 
 <style lang="css">

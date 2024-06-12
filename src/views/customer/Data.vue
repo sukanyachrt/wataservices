@@ -1,6 +1,7 @@
 <script setup>
 import { formatDate_notime, compareDates } from '@/plugins/function.js'
 import ConfirmPasscode from '@/views/customer/ConfirmPasscode.vue'
+import Showimage from '@/views/project/Showimage.vue'
 import services from '@/services'
 import Swal from 'sweetalert2'
 import { useRoute } from 'vue-router';
@@ -9,6 +10,7 @@ const overlay = ref(false)
 const encrypted_url = ref(route.params.id)
 const passcode = ref('');
 const myConfirmPasscode = ref(null)
+const myShowimageRef = ref(null)
 const dataProject = ref([]);
 const visible = ref(false)
 onMounted(async () => {
@@ -74,6 +76,16 @@ const getData = async (auth) => {
     }
 }
 
+const showImage = async (image) => {
+    if (myShowimageRef.value) {
+        const result = await myShowimageRef.value.showDialog({
+            image
+        })
+        console.log(result)
+    }
+
+}
+
 </script>
 <template>
     <div class="text-center">
@@ -120,7 +132,7 @@ const getData = async (auth) => {
                             <VTable style="width: 100% !important;">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-center"
+                                        <th class="text-uppercase text-left"
                                             v-for="(itemCol, indexCol) in item.columns" :key="indexCol">
                                             {{ itemCol.name }}
                                         </th>
@@ -156,7 +168,7 @@ const getData = async (auth) => {
 
                                             </template>
                                             <template v-else-if="itemC.ref_name === 'image'">
-                                                <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
+                                                <VAvatar @click="showImage(itemReport[itemC.ref_name])" v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
                                                     class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
                                             </template>
                                             <template v-else-if="itemC.ref_name === 'draft_date'">
@@ -208,4 +220,5 @@ const getData = async (auth) => {
     </VRow>
 
     <ConfirmPasscode ref="myConfirmPasscode" />
+    <Showimage ref="myShowimageRef" />
 </template>

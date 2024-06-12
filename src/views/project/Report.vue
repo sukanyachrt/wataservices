@@ -1,4 +1,5 @@
 <script setup>
+import Showimage from '@/views/project/Showimage.vue'
 import Swal from 'sweetalert2'
 import Cookies from 'js-cookie'
 import services from '@/services'
@@ -25,7 +26,7 @@ const myConfirmDelRef = ref(null)
 const dataProject = ref([]);
 const dataResponders = ref([])
 const editingReportIndex = ref(null);  // Added for tracking the edit state
-
+const myShowimageRef = ref(null)
 onMounted(async () => {
     if (Project_Id.value) {
         await reportProject();
@@ -36,7 +37,6 @@ const reportProject = async () => {
     try {
         overlay.value = true
         const response = await services.reportProject(Project_Id.value, auth);
-        console.log(response)
         overlay.value = false
         if (response.data.status === "Successful") {
             dataProject.value = response.data.data.project;
@@ -304,7 +304,15 @@ const removeImage = item => {
     fileInput.value = '';
     item.image = ''
 }
+const showImage = async (image) => {
+    if (myShowimageRef.value) {
+        const result = await myShowimageRef.value.showDialog({
+            image
+        })
+        console.log(result)
+    }
 
+}
 </script>
 
 <template>
@@ -358,7 +366,7 @@ const removeImage = item => {
                                     :key="indexCol">
                                     {{ itemCol.name }}
                                 </th>
-                                <th v-if="item.id>0">
+                                <th v-if="item.id > 0">
                                     บันทึกภายใน
                                 </th>
                                 <th style="background-color: #fff !important;" class="text-end"
@@ -390,12 +398,13 @@ const removeImage = item => {
                                                 }}</span>
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'image'">
-                                            <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
+                                            <VAvatar @click="showImage(itemReport[itemC.ref_name])"
+                                                v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
                                                 class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'draft_date'">
                                             <span v-if="itemReport[itemC.ref_name]">
-                                            {{ formatDate_notime(itemReport[itemC.ref_name]) }}
+                                                {{ formatDate_notime(itemReport[itemC.ref_name]) }}
                                             </span>
 
 
@@ -641,7 +650,7 @@ const removeImage = item => {
                                             }}</span>
                                     </template>
                                     <template v-else-if="itemC.ref_name === 'image'">
-                                        <VAvatar v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
+                                        <VAvatar @click="showImage(itemReport[itemC.ref_name])" v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
                                             class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
                                     </template>
                                     <template v-else-if="itemC.ref_name === 'draft_date'">
@@ -683,4 +692,5 @@ const removeImage = item => {
         </VCol>
     </VRow>
     <myDialog ref="myConfirmDelRef" />
+    <Showimage ref="myShowimageRef" />
 </template>
