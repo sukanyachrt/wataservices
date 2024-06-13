@@ -78,10 +78,11 @@ const convertStatus = (item, statuses) => {
     }
 }
 const convertrtetretre = (item) => {
+
     let foundResponders = dataResponders.value.find(responders => responders.id === item);
     if (foundResponders) {
         if (foundResponders.image) {
-            return [foundResponders.image, "image"];
+            return [foundResponders.image, "image", foundResponders.name];
         } else {
             return [foundResponders.name, "name"];
         }
@@ -391,9 +392,12 @@ const showImage = async (image) => {
                                             </div>
                                         </template>
                                         <template v-else-if="itemC.ref_name === 'responder_id'">
-                                            <VAvatar v-if="convertrtetretre(itemReport[itemC.ref_name])[1] === 'image'"
-                                                rounded="lg" size="50" class="me-6 my-2"
-                                                :image="convertrtetretre(itemReport[itemC.ref_name])[0]" />
+                                            <span v-if="convertrtetretre(itemReport[itemC.ref_name])[1] === 'image'">
+                                                <!-- <VAvatar rounded="lg" size="25" class="me-6 my-2"
+                                                    :image="convertrtetretre(itemReport[itemC.ref_name])[0]" /> -->
+                                                {{ convertrtetretre(itemReport[itemC.ref_name])[2] }}
+                                            </span>
+
                                             <span v-else>{{ convertrtetretre(itemReport[itemC.ref_name])[0]
                                                 }}</span>
                                         </template>
@@ -643,14 +647,19 @@ const showImage = async (image) => {
                                     </template>
 
                                     <template v-else-if="itemC.ref_name === 'responder_id'">
-                                        <VAvatar v-if="convertrtetretre(itemReport[itemC.ref_name])[1] === 'image'"
+                                        <!-- <VAvatar v-if="convertrtetretre(itemReport[itemC.ref_name])[1] === 'image'"
                                             rounded="lg" size="50" class="me-6 my-2"
-                                            :image="convertrtetretre(itemReport[itemC.ref_name])[0]" />
+                                            :image="convertrtetretre(itemReport[itemC.ref_name])[0]" /> -->
+                                        <span v-if="convertrtetretre(itemReport[itemC.ref_name])[1] === 'image'">
+                                            
+                                            {{ convertrtetretre(itemReport[itemC.ref_name])[2] }}
+                                        </span>
                                         <span v-else>{{ convertrtetretre(itemReport[itemC.ref_name])[0]
                                             }}</span>
                                     </template>
                                     <template v-else-if="itemC.ref_name === 'image'">
-                                        <VAvatar @click="showImage(itemReport[itemC.ref_name])" v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
+                                        <VAvatar @click="showImage(itemReport[itemC.ref_name])"
+                                            v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
                                             class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
                                     </template>
                                     <template v-else-if="itemC.ref_name === 'draft_date'">

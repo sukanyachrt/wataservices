@@ -104,7 +104,7 @@ const showImage = async (image) => {
                     <VAlert border="start" color="primary" variant="tonal">
                         <h1 class="my-4">{{ dataProject.name }}</h1>
                     </VAlert>
-                    
+
 
                 </VCol>
                 <VCol cols="12" class="d-flex align-center justify-start justify-md-end">
@@ -132,8 +132,8 @@ const showImage = async (image) => {
                             <VTable style="width: 100% !important;">
                                 <thead>
                                     <tr>
-                                        <th class="text-uppercase text-left"
-                                            v-for="(itemCol, indexCol) in item.columns" :key="indexCol">
+                                        <th class="text-uppercase text-left" v-for="(itemCol, indexCol) in item.columns"
+                                            :key="indexCol">
                                             {{ itemCol.name }}
                                         </th>
                                         <th>
@@ -148,7 +148,8 @@ const showImage = async (image) => {
                                         <td class="text-uppercase text-left" v-for="(itemC, indexC) in item.columns"
                                             :key="indexC">
 
-                                            <template v-if="itemC.ref_name === 'status_id' || itemC.ref_name === 'status'">
+                                            <template
+                                                v-if="itemC.ref_name === 'status_id' || itemC.ref_name === 'status'">
                                                 <VChip
                                                     :style="{ backgroundColor: itemReport.status.color, 'color': '#fff' }"
                                                     variant="outlined" class="rounded">{{ itemReport.status.name }}
@@ -156,10 +157,13 @@ const showImage = async (image) => {
                                             </template>
                                             <template v-else-if="itemC.ref_name === 'responder_id'">
                                                 <template v-if="itemReport.responder">
-
-                                                    <VAvatar v-if="itemReport.responder.image !== ''" rounded="lg"
-                                                        size="50" class="me-6 my-2"
-                                                        :image="itemReport.responder.image" />
+                                                    <span v-if="itemReport.responder.image !== ''">
+                                                        <VAvatar  rounded="lg"
+                                                            size="30" class="me-6 my-2"
+                                                            :image="itemReport.responder.image" />
+                                                            {{ itemReport.responder.name }}
+                                                    </span>
+                                                    
                                                     <span v-else>
                                                         {{ itemReport.responder.name }}
                                                     </span>
@@ -168,7 +172,8 @@ const showImage = async (image) => {
 
                                             </template>
                                             <template v-else-if="itemC.ref_name === 'image'">
-                                                <VAvatar @click="showImage(itemReport[itemC.ref_name])" v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
+                                                <VAvatar @click="showImage(itemReport[itemC.ref_name])"
+                                                    v-if="itemReport[itemC.ref_name] !== ''" rounded="lg" size="60"
                                                     class="me-6 my-2" :image="itemReport[itemC.ref_name]" />
                                             </template>
                                             <template v-else-if="itemC.ref_name === 'draft_date'">
@@ -186,8 +191,9 @@ const showImage = async (image) => {
                                                     {{ formatDate_notime(itemReport[itemC.ref_name]) }}
                                                 </span>
                                             </template>
-                                            
-                                            <template v-else-if="itemC.ref_name === 'url' || itemC.ref_name === 'group_link'">
+
+                                            <template
+                                                v-else-if="itemC.ref_name === 'url' || itemC.ref_name === 'group_link'">
                                                 <template v-if="itemReport[itemC.ref_name]">
                                                     <a :href="itemReport[itemC.ref_name]" target="_blank">ลิงค์</a>
                                                 </template>

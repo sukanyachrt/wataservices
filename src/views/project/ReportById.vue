@@ -51,27 +51,27 @@ const getReport = async () => {
             overlay.value = false
         } catch (error) {
             overlay.value = false;
-        console.log(error)
-        if (error.response.status === 401) {
-            router.push('/logout')
-            Swal.fire({
-                position: "top-end",
-                icon: "error",
-                title: error.response.data.message,
-                showConfirmButton: false,
-                timer: 2000
-            });
+            console.log(error)
+            if (error.response.status === 401) {
+                router.push('/logout')
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: error.response.data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
 
-        }
-        else {
-            Swal.fire({
-                position: "top-end",
-                icon: "error",
-                title: error.response.data.message,
-                showConfirmButton: false,
-                timer: 2000
-            });
-        }
+            }
+            else {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: error.response.data.message,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
         }
     }
 }
@@ -89,7 +89,7 @@ const convertrtetretre = (item) => {
     let foundResponders = dataresponders.value.find(responders => responders.id === item);
     if (foundResponders) {
         if (foundResponders.image) {
-            return [foundResponders.image, "image"];
+            return [foundResponders.image, "image", foundResponders.name];
         } else {
             return [foundResponders.name, "name"];
         }
@@ -135,7 +135,7 @@ const saveReport = async () => {
 
     }
     try {
-         overlay.value = true;
+        overlay.value = true;
         const response = await services.reportUpdate(report_id.value, newItem, auth.value);
         console.log(response)
         if (response.data.status === "Successful") {
@@ -301,7 +301,7 @@ const showImage = async (image) => {
                                             <template v-else-if="itemC.ref_name === 'image'">
                                                 <VBadge v-if="dataReport.image" icon="ri-close-line" color="error"
                                                     @click="removeImage(dataReport)" class="v-badge--tonal my-4">
-                                                    <VAvatar  size="50">
+                                                    <VAvatar size="50">
                                                         <VImg :src="dataReport.image" />
                                                     </VAvatar>
                                                 </VBadge>
@@ -358,15 +358,19 @@ const showImage = async (image) => {
                                                 </div>
                                             </template>
                                             <template v-else-if="itemC.ref_name === 'responder_id'">
-                                                <VAvatar
-                                                    v-if="convertrtetretre(dataReport[itemC.ref_name])[1] === 'image'"
-                                                    rounded="lg" size="50" class="me-6 my-2"
+                                                <span
+                                                v-if="convertrtetretre(dataReport[itemC.ref_name])[1] === 'image'">
+                                                    <VAvatar rounded="lg" size="30" class="me-6 my-2"
                                                     :image="convertrtetretre(dataReport[itemC.ref_name])[0]" />
+                                                    {{ convertrtetretre(dataReport[itemC.ref_name])[2] }}
+                                                </span>
+                                                
                                                 <span v-else>{{ convertrtetretre(dataReport[itemC.ref_name])[0]
                                                     }}</span>
                                             </template>
                                             <template v-else-if="itemC.ref_name === 'image'">
-                                                <VAvatar @click="showImage(dataReport[itemC.ref_name])" v-if="dataReport[itemC.ref_name] !== ''" rounded="lg" size="50"
+                                                <VAvatar @click="showImage(dataReport[itemC.ref_name])"
+                                                    v-if="dataReport[itemC.ref_name] !== ''" rounded="lg" size="50"
                                                     class="me-6 my-2" :image="dataReport[itemC.ref_name]" />
                                             </template>
                                             <template
@@ -387,7 +391,7 @@ const showImage = async (image) => {
                                         </template>
                                     </td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td class="text-right">
                                         <VBtn v-if="!isEditing" size="small" color="warning" @click="toggleEdit">
                                             <VIcon class="me-1" icon="ri-edit-box-line" size="22" />

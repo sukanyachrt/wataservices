@@ -86,7 +86,7 @@ const groupedReports = async () => {
     });
 
     const orderedGroups = {};
-    const order = ['today', 'tomorrow', 'after_tomorrow'];
+    const order = ['before_1','before_2','today', 'tomorrow', 'after_tomorrow_1','after_tomorrow_2','after_tomorrow_3','after_tomorrow_4','after_tomorrow_5','after_tomorrow_6','after_tomorrow_7'];
 
     // Add ordered groups first
     order.forEach((key) => {
