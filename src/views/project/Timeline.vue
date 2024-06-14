@@ -29,15 +29,16 @@ const getdataTimeline = async () => {
     try {
         overlay.value = true;
         const response = await services.projectTimeline(auth);
-       // console.log(response);
+        // console.log(response);
         if (response.data.status === 'Successful') {
             data.value = response.data.data;
             await groupedReports();
+            console.log(grouped.value)
             overlay.value = false;
         }
     } catch (error) {
         overlay.value = false;
-      //  console.log(error)
+        //  console.log(error)
         if (error.response.status === 401) {
             router.push('/logout')
             Swal.fire({
@@ -67,6 +68,7 @@ const groupedReports = async () => {
     data.value.forEach((item) => {
         item.services.forEach((service) => {
             service.reports.forEach((report) => {
+                console.log(item)
                 if (!tempGrouped[report.expected]) {
                     tempGrouped[report.expected] = {};
                 }
@@ -86,7 +88,7 @@ const groupedReports = async () => {
     });
 
     const orderedGroups = {};
-    const order = ['before_1','before_2','today', 'tomorrow', 'after_tomorrow_1','after_tomorrow_2','after_tomorrow_3','after_tomorrow_4','after_tomorrow_5','after_tomorrow_6','after_tomorrow_7'];
+    const order = ['before_2', 'before_1', 'today', 'tomorrow', 'after_tomorrow_1', 'after_tomorrow_2', 'after_tomorrow_3', 'after_tomorrow_4', 'after_tomorrow_5', 'after_tomorrow_6', 'after_tomorrow_7'];
 
     // Add ordered groups first
     order.forEach((key) => {
@@ -110,7 +112,7 @@ const showDetailReport = async (report_id) => {
             report_id,
             auth
         })
-       // console.log(result) 
+        // console.log(result) 
     }
 }
 
@@ -132,16 +134,25 @@ const showDetailReport = async (report_id) => {
             <h1>Timeline </h1>
         </VCol>
     </VRow>
-    <v-timeline v-if="data.length>0">
+    <v-timeline v-if="data.length > 0">
         <v-timeline-item size="large" v-for="(projects, expected) in grouped" :key="expected" dot-color="primary">
             <template v-slot:opposite>
                 <v-card-title>
-                    <span>{{ expected }}</span>
+
+                    <span v-if="expected === 'today' || expected === 'tomorrow'">
+                        {{ expected }}
+                    </span>
+                    <span v-else>
+                        {{
+            formatDate_notime(projects[Object.keys(projects)[0]].services[Object.keys(projects[Object.keys(projects)[0]].services)[0]][0].draft_date)
+        }}
+                    </span>
                 </v-card-title>
             </template>
             <v-card class="elevation-2 my-2" v-for="(project, name) in projects" :key="project.id">
                 <v-card-title :class="['text-h6', `bg-primary`, `outlined`]">
                     {{ name }}
+
                 </v-card-title>
                 <v-card-text class="my-2">
                     <div v-for="(reports, serviceName) in project.services" :key="serviceName">
